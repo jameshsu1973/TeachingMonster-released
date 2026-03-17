@@ -1,0 +1,422 @@
+[
+  {
+    "slide": 1,
+    "script": "今天我們要學習 Self-Attention 的機制，這是 Transformer 模型中最核心的概念。",
+    "tokenized_words": [
+      "今天",
+      "我們",
+      "要",
+      "學習",
+      " ",
+      "Self",
+      "-",
+      "Attention",
+      " ",
+      "的",
+      "機制",
+      "，",
+      "這是",
+      " ",
+      "Transformer",
+      " ",
+      "模型",
+      "中",
+      "最",
+      "核心",
+      "的",
+      "概念",
+      "。"
+    ],
+    "num_tokens": 23,
+    "mp3_file": "1.mp3",
+    "mp3_size_bytes": 40464,
+    "duration_sec": 5.74,
+    "timings": [
+      {
+        "word": "今天",
+        "start": 0.0,
+        "end": 0.44
+      },
+      {
+        "word": "我們",
+        "start": 0.44,
+        "end": 0.74
+      },
+      {
+        "word": "要",
+        "start": 0.74,
+        "end": 0.98
+      },
+      {
+        "word": "學習",
+        "start": 0.98,
+        "end": 1.16
+      },
+      {
+        "word": " ",
+        "start": 1.16,
+        "end": 1.38
+      },
+      {
+        "word": "Self",
+        "start": 1.38,
+        "end": 1.38
+      },
+      {
+        "word": "-",
+        "start": 1.38,
+        "end": 1.52
+      },
+      {
+        "word": "Attention",
+        "start": 1.52,
+        "end": 1.52
+      },
+      {
+        "word": " ",
+        "start": 1.52,
+        "end": 1.64
+      },
+      {
+        "word": "的",
+        "start": 1.94,
+        "end": 2.18
+      },
+      {
+        "word": "機制",
+        "start": 2.18,
+        "end": 2.36
+      },
+      {
+        "word": "，",
+        "start": 2.36,
+        "end": 2.56
+      },
+      {
+        "word": "這是",
+        "start": 2.94,
+        "end": 3.22
+      },
+      {
+        "word": " ",
+        "start": 3.22,
+        "end": 3.48
+      },
+      {
+        "word": "Transformer",
+        "start": 3.48,
+        "end": 3.48
+      },
+      {
+        "word": " ",
+        "start": 3.48,
+        "end": 3.74
+      },
+      {
+        "word": "模型",
+        "start": 3.74,
+        "end": 3.74
+      },
+      {
+        "word": "中",
+        "start": 4.26,
+        "end": 4.52
+      },
+      {
+        "word": "最",
+        "start": 4.52,
+        "end": 4.82
+      },
+      {
+        "word": "核心",
+        "start": 4.82,
+        "end": 5.02
+      },
+      {
+        "word": "的",
+        "start": 5.16,
+        "end": 5.34
+      },
+      {
+        "word": "概念",
+        "start": 5.34,
+        "end": 5.48
+      },
+      {
+        "word": "。",
+        "start": 5.48,
+        "end": 5.74
+      }
+    ]
+  },
+  {
+    "slide": 2,
+    "script": "Self-Attention 允許模型在處理每個詞時，同時關注序列中的所有其他詞。",
+    "tokenized_words": [
+      "Self",
+      "-",
+      "Attention",
+      " ",
+      "允許",
+      "模型",
+      "在",
+      "處理",
+      "每個",
+      "詞時",
+      "，",
+      "同時",
+      "關注",
+      "序列",
+      "中",
+      "的",
+      "所有",
+      "其他",
+      "詞",
+      "。"
+    ],
+    "num_tokens": 20,
+    "mp3_file": "2.mp3",
+    "mp3_size_bytes": 41328,
+    "duration_sec": 4.52,
+    "timings": [
+      {
+        "word": "Self",
+        "start": 0.0,
+        "end": 0.34
+      },
+      {
+        "word": "-",
+        "start": 0.34,
+        "end": 0.42
+      },
+      {
+        "word": "Attention",
+        "start": 0.42,
+        "end": 0.42
+      },
+      {
+        "word": " ",
+        "start": 0.42,
+        "end": 0.68
+      },
+      {
+        "word": "允許",
+        "start": 0.68,
+        "end": 0.68
+      },
+      {
+        "word": "模型",
+        "start": 0.68,
+        "end": 0.86
+      },
+      {
+        "word": "在",
+        "start": 1.62,
+        "end": 1.92
+      },
+      {
+        "word": "處理",
+        "start": 1.92,
+        "end": 2.12
+      },
+      {
+        "word": "每個",
+        "start": 2.12,
+        "end": 2.26
+      },
+      {
+        "word": "詞時",
+        "start": 2.26,
+        "end": 2.44
+      },
+      {
+        "word": "，",
+        "start": 2.44,
+        "end": 2.62
+      },
+      {
+        "word": "同時",
+        "start": 2.62,
+        "end": 2.62
+      },
+      {
+        "word": "關注",
+        "start": 2.62,
+        "end": 2.78
+      },
+      {
+        "word": "序列",
+        "start": 2.78,
+        "end": 3.16
+      },
+      {
+        "word": "中",
+        "start": 3.44,
+        "end": 3.64
+      },
+      {
+        "word": "的",
+        "start": 3.64,
+        "end": 3.82
+      },
+      {
+        "word": "所有",
+        "start": 3.82,
+        "end": 3.96
+      },
+      {
+        "word": "其他",
+        "start": 3.96,
+        "end": 4.16
+      },
+      {
+        "word": "詞",
+        "start": 4.16,
+        "end": 4.4
+      },
+      {
+        "word": "。",
+        "start": 4.4,
+        "end": 4.52
+      }
+    ]
+  },
+  {
+    "slide": 3,
+    "script": "簡單來說，它會計算 Query、Key 和 Value 三個矩陣的注意力分數。",
+    "tokenized_words": [
+      "簡單",
+      "來",
+      "說",
+      "，",
+      "它會",
+      "計算",
+      " ",
+      "Query",
+      "、",
+      "Key",
+      " ",
+      "和",
+      " ",
+      "Value",
+      " ",
+      "三個",
+      "矩陣",
+      "的",
+      "注意力",
+      "分數",
+      "。"
+    ],
+    "num_tokens": 21,
+    "mp3_file": "3.mp3",
+    "mp3_size_bytes": 37152,
+    "duration_sec": 4.98,
+    "timings": [
+      {
+        "word": "簡單",
+        "start": 0.0,
+        "end": 0.46
+      },
+      {
+        "word": "來",
+        "start": 0.46,
+        "end": 0.94
+      },
+      {
+        "word": "說",
+        "start": 1.36,
+        "end": 1.54
+      },
+      {
+        "word": "，",
+        "start": 1.54,
+        "end": 1.7
+      },
+      {
+        "word": "它會",
+        "start": 1.7,
+        "end": 1.7
+      },
+      {
+        "word": "計算",
+        "start": 1.7,
+        "end": 1.86
+      },
+      {
+        "word": " ",
+        "start": 1.86,
+        "end": 2.04
+      },
+      {
+        "word": "Query",
+        "start": 2.04,
+        "end": 2.04
+      },
+      {
+        "word": "、",
+        "start": 2.04,
+        "end": 2.28
+      },
+      {
+        "word": "Key",
+        "start": 2.82,
+        "end": 2.96
+      },
+      {
+        "word": " ",
+        "start": 2.96,
+        "end": 3.16
+      },
+      {
+        "word": "和",
+        "start": 3.16,
+        "end": 3.16
+      },
+      {
+        "word": " ",
+        "start": 3.16,
+        "end": 3.38
+      },
+      {
+        "word": "Value",
+        "start": 3.38,
+        "end": 3.38
+      },
+      {
+        "word": " ",
+        "start": 3.58,
+        "end": 3.68
+      },
+      {
+        "word": "三個",
+        "start": 3.68,
+        "end": 3.68
+      },
+      {
+        "word": "矩陣",
+        "start": 3.68,
+        "end": 3.84
+      },
+      {
+        "word": "的",
+        "start": 4.18,
+        "end": 4.32
+      },
+      {
+        "word": "注意力",
+        "start": 4.32,
+        "end": 4.56
+      },
+      {
+        "word": "分數",
+        "start": 4.56,
+        "end": 4.76
+      },
+      {
+        "word": "。",
+        "start": 4.76,
+        "end": 4.98
+      }
+    ]
+  }
+]
