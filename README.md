@@ -1,5 +1,6 @@
 # Teaching Monster: Baseline & Starter Kit!
 
+I only work on tts part
 ## Prerequisite to Run the Baseline
 * Gemini API: visit [the website](https://aistudio.google.com/welcome) to get your API Key, and in `config/.env`, insert:
    ```
