@@ -27,3 +27,5 @@ python -m scripts.T2V_pipeline \
   [-o final_video.mp4] \
   [-d ./output]
 ```
+
+python -m scripts.T2V_pipeline  -r "Topic: Chemistry of Life - Structure of water and hydrogen bonding"   -p "Education Level: University | Learning Motivation: Research papers | Timeline Urgency: Urgent"   -c config/default.yaml   -o my_video.mp4   -d ./output 

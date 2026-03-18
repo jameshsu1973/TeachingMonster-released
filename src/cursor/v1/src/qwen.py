@@ -11,10 +11,15 @@ class QwenVL():
             load_in_4bit=True,
             bnb_4bit_compute_dtype=torch.bfloat16,   # 計算時用 bf16
             bnb_4bit_use_double_quant=True,          # double quant
-            bnb_4bit_quant_type="nf4"                # NF4 (QLoRA標準)
+            bnb_4bit_quant_type="nf4",               # NF4 (QLoRA標準)
+            llm_int8_enable_fp32_cpu_offload=True
         )
         self.processor = AutoProcessor.from_pretrained(model_path)
-        self.model = AutoModelForImageTextToText.from_pretrained(model_path, device_map="auto", quantization_config=quant_config)
+        self.model = AutoModelForImageTextToText.from_pretrained(
+            model_path, 
+            device_map="auto", 
+            quantization_config=quant_config
+        )
     
     def inference(self, messages: dict) -> str:
         inputs = self.processor.apply_chat_template(
