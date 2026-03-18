@@ -1,6 +1,7 @@
 # Teaching Monster: Baseline & Starter Kit!
 
 I only work on tts part
+need to download LibreOffice for doing pptx to jpg
 ## Prerequisite to Run the Baseline
 * Gemini API: visit [the website](https://aistudio.google.com/welcome) to get your API Key, and in `config/.env`, insert:
    ```
@@ -29,3 +30,5 @@ python -m scripts.T2V_pipeline \
 ```
 
 python -m scripts.T2V_pipeline  -r "Topic: Chemistry of Life - Structure of water and hydrogen bonding"   -p "Education Level: University | Learning Motivation: Research papers | Timeline Urgency: Urgent"   -c config/default.yaml   -o my_video.mp4   -d ./output 
+
+python -m scripts.T2V_pipeline  -r "Topic: Chemistry of Life - Structure of water and hydrogen bonding"   -p "Education Level: University | Learning Motivation: Research papers | Timeline Urgency: Urgent"   -c config/default.yaml   -o my_video.mp4   -d ./output --use-existing-slides

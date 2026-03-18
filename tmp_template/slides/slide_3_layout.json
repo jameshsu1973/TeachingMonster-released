@@ -1,0 +1,82 @@
+{
+  "layout": "CUSTOM",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "Beyond the Basics: sp3 Hybridization",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 12.33,
+        "h": 0.7,
+        "style": {
+          "font_size": 36,
+          "alignment": "LEFT",
+          "bold": true,
+          "color": "#2C3E50"
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "Oxygen's 1s² 2s² 2p⁴ configuration doesn't stay in its lane; it hybridizes into four sp³ lobes to prepare for molecular bonding.",
+        "x": 0.5,
+        "y": 1.2,
+        "w": 12.33,
+        "h": 0.8,
+        "style": {
+          "font_size": 20,
+          "alignment": "LEFT",
+          "color": "#34495E"
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "Standard Atomic P-Orbitals",
+        "x": 0.5,
+        "y": 2.2,
+        "w": 5.9,
+        "h": 0.4,
+        "style": {
+          "font_size": 18,
+          "alignment": "CENTER",
+          "bold": true
+        }
+      },
+      {
+        "type": "image",
+        "prompt": "Scientific 3D illustration of standard atomic p-orbitals (px, py, pz) on a Cartesian coordinate system, blue and red lobes, clean white background, high resolution.",
+        "path": "standard_p_orbitals.png",
+        "x": 0.5,
+        "y": 2.7,
+        "w": 5.9,
+        "h": 4.3
+      },
+      {
+        "type": "textbox",
+        "text": "Tetrahedral sp3 Hybridized Lobes",
+        "x": 6.93,
+        "y": 2.2,
+        "w": 5.9,
+        "h": 0.4,
+        "style": {
+          "font_size": 18,
+          "alignment": "CENTER",
+          "bold": true
+        }
+      },
+      {
+        "type": "image",
+        "prompt": "Scientific 3D illustration of four sp3 hybridized orbital lobes arranged in a tetrahedral geometry, purple and teal gradient, oxygen nucleus at center, clean white background, high resolution.",
+        "path": "sp3_hybrid_orbitals.png",
+        "x": 6.93,
+        "y": 2.7,
+        "w": 5.9,
+        "h": 4.3
+      }
+    ]
+  },
+  "id": "slide_3"
+}

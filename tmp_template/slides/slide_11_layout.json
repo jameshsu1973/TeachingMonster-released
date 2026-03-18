@@ -1,0 +1,98 @@
+{
+  "layout": "CUSTOM",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "The Picosecond Lifetime",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 12.33,
+        "h": 0.8,
+        "style": {
+          "font_size": 44,
+          "alignment": "CENTER",
+          "color": "#003366",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "Liquid water is a series of short-term commitments. Bonds break and reform every...",
+        "x": 0.8,
+        "y": 2.0,
+        "w": 4.5,
+        "h": 1.5,
+        "style": {
+          "font_size": 24,
+          "alignment": "LEFT",
+          "color": "#333333"
+        }
+      },
+      {
+        "type": "math",
+        "latex": "10^{-12}",
+        "x": 0.8,
+        "y": 3.6,
+        "w": 2.0,
+        "h": 1.0,
+        "style": {
+          "font_size": 48,
+          "color": "#007BFF"
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "...seconds in a constant molecular shuffle.",
+        "x": 0.8,
+        "y": 4.8,
+        "w": 4.5,
+        "h": 1.0,
+        "style": {
+          "font_size": 24,
+          "alignment": "LEFT",
+          "color": "#333333"
+        }
+      },
+      {
+        "type": "image",
+        "prompt": "Abstract molecular visualization of water molecules with heavy motion blur and glowing hydrogen bonds, dynamic composition, cinematic lighting, 8k resolution.",
+        "path": "molecular_shuffle.png",
+        "x": 6.0,
+        "y": 1.5,
+        "w": 6.5,
+        "h": 5.0
+      },
+      {
+        "type": "shape",
+        "shape_type": "RECTANGLE",
+        "color": "#007BFF",
+        "text": "FAST FORWARD",
+        "x": 10.5,
+        "y": 6.8,
+        "w": 2.0,
+        "h": 0.4,
+        "style": {
+          "font_size": 12,
+          "color": "#FFFFFF"
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "▶▶",
+        "x": 12.5,
+        "y": 6.75,
+        "w": 0.5,
+        "h": 0.5,
+        "style": {
+          "font_size": 20,
+          "color": "#007BFF"
+        }
+      }
+    ]
+  },
+  "id": "slide_11"
+}

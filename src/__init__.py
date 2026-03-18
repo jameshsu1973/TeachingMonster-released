@@ -1,6 +1,6 @@
 #from .clarification.clarification import ClarificationModule
 from .config_schema import AppConfig
-from .cursor.cursor import CursorModule
+#from .cursor.cursor import CursorModule
 from .gemini_client import GeminiClient
 from .outline.t2v_outline import T2VOutlineModule
 #from .outline.v2v_outline import V2VOutlineModule
@@ -12,7 +12,7 @@ from .tts.tts import TTSModule
 __all__ = [
     "AppConfig",
     #"ClarificationModule",
-    "CursorModule",
+    #"CursorModule",
     "GeminiClient",
     #"SlidesModule_3B1B",
     "SlidesModule_PPT",

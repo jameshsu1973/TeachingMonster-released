@@ -1,0 +1,48 @@
+{
+  "layout": "CUSTOM",
+  "style": {
+    "background": "#121212"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "Water: Life's High-Energy, High-Drama Solvent",
+        "x": 0.5,
+        "y": 0.7,
+        "w": 12.33,
+        "h": 1.2,
+        "style": {
+          "font_size": 54,
+          "alignment": "CENTER",
+          "color": "#FFFFFF",
+          "bold": true
+        }
+      },
+      {
+        "type": "image",
+        "prompt": "A high-resolution 3D render of a water molecule (H2O) with vibrant blue oxygen and white hydrogen atoms, wearing a small gold shiny badge that says 'World's Best Solvent', cinematic lighting, dark research-mode background, 8k resolution.",
+        "path": "visuals/water_molecule_hero.png",
+        "x": 4.165,
+        "y": 2.2,
+        "w": 5.0,
+        "h": 3.5
+      },
+      {
+        "type": "textbox",
+        "text": "You are 70% water, 100% curious, and about to discover why the most common molecule on Earth is actually a physical anomaly.",
+        "x": 1.665,
+        "y": 5.8,
+        "w": 10.0,
+        "h": 1.2,
+        "style": {
+          "font_size": 24,
+          "alignment": "CENTER",
+          "color": "#E0E0E0",
+          "italic": true
+        }
+      }
+    ]
+  },
+  "id": "slide_1"
+}

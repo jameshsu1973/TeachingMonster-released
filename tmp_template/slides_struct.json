@@ -1,0 +1,363 @@
+[
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "Water: The Weirdest Liquid in the Universe (And Why You’re 70% High-Performance Solvent)"
+            },
+            {
+                "id": "text2",
+                "content": "A technical dive into molecular stickiness, dipole vectors, and why your proteins don't just melt into a puddle of sadness."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "High-resolution 3D rendering of a single water molecule (Oxygen-Red, Hydrogen-Blue) positioned as a central hero image with a subtle 'main character' glow."
+            }
+        ],
+        "layout": "Hero layout with centered bold title, witty subtitle below, and a high-impact central molecular visual."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "The Aqueous Agenda: From Sub-Atomic Greed to Genetic Stability"
+            },
+            {
+                "id": "text2",
+                "content": "I. Electronegativity & Dipoles: The 'Oxygen is Selfish' Principle. II. Hydrogen Bond Energetics: The Physics of the 20 kJ/mol Sweet Spot. III. Thermodynamic Emergence: Why Ice Floats and Water Stays Cool. IV. Macromolecular Scaffolding: The H-Bond's Role in Protein and DNA Architecture."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Four-step linear roadmap icon set using Navy, Slate, and Oxygen-Red tones to denote the progression from atom to macromolecule."
+            }
+        ],
+        "layout": "Clean, four-quadrant agenda layout with icon-coded sections corresponding to the course sequences."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "Electronegativity: Oxygen’s Relentless Electron Thievery"
+            },
+            {
+                "id": "text2",
+                "content": "Oxygen (EN 3.44) vs. Hydrogen (EN 2.20) creates a Delta EN of 1.24. This isn't a partnership; it's a lopsided custody battle for electron density."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Pauling Scale comparison chart highlighting O and H. Adjacent electrostatic potential map showing electron density concentrated around the Oxygen nucleus."
+            }
+        ],
+        "layout": "Split-screen layout. Left: Data-dense Pauling Scale analysis. Right: Electrostatic potential map visual."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "sp3 Hybridization: The Geometry of Conflict"
+            },
+            {
+                "id": "text2",
+                "content": "Oxygen’s lone pairs are the spatial equivalent of 'manspreading.' Their repulsion compresses the ideal 109.5-degree tetrahedral angle into a bent 104.5-degree reality."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Orbital geometry diagram showing the four sp3 hybrid orbitals. Two orbitals contain lone pairs, pushing the two O-H bonding orbitals closer together."
+            }
+        ],
+        "layout": "Technical diagram layout with annotations explaining the compression of the H-O-H bond angle."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "Vector Summation: Calculating the Net Molecular Dipole (mu)"
+            },
+            {
+                "id": "text2",
+                "content": "Because the molecule is bent and not linear, the individual O-H bond dipoles do not cancel. They add up. The result? A net dipole moment that makes water a polar powerhouse."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Vector analysis diagram showing two bond dipoles as arrows and their resultant vector pointing toward the Oxygen atom."
+            }
+        ],
+        "layout": "Geometric derivation layout. Visual focuses on the mathematical vector addition of the dipoles."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "Hydration Spheres: Molecular Crowd Control"
+            },
+            {
+                "id": "text2",
+                "content": "Ions are immediately surrounded by water molecules oriented by charge. It's the ultimate 'social distancing' mechanism for solutes."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Diagram of a Sodium ion (Na+) and Chloride ion (Cl-) individually encased in ordered hydration shells of water molecules."
+            }
+        ],
+        "layout": "Comparative layout showing how water dipoles flip their orientation to accommodate positive vs negative ions."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "The Hydrogen Bond: Anatomy of a Weak Relationship"
+            },
+            {
+                "id": "text2",
+                "content": "Identifying the players: The Donor (D-H) and the Acceptor (A). In biology, this is usually a VIP list featuring Nitrogen, Oxygen, and the occasional Fluorine."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Structural formula highlighting a Donor O-H group and an Acceptor O atom. Dashed lines indicate the H-bond; solid lines indicate covalent bonds."
+            }
+        ],
+        "layout": "Anatomical labeling layout. Use of color-coding (Red for Oxygen, Blue for Hydrogen) to maintain consistency."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "Energetics and the 'Goldilocks Zone'"
+            },
+            {
+                "id": "text2",
+                "content": "Optimal H-bond length is 1.8 to 2.0 Angstroms. Any closer and the nuclei repel; any further and the attraction dies. It’s the perfect 'just friends' distance."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Lennard-Jones Potential Energy graph showing the energy well for an H-bond. The 'sweet spot' of minimum energy is clearly marked at ~1.9 Angstroms."
+            }
+        ],
+        "layout": "Coordinate graph layout. Primary focus is the potential energy well plot on a high-contrast background."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "Directionality: Linear is Stable, Bent is Broken"
+            },
+            {
+                "id": "text2",
+                "content": "For maximum orbital overlap, the D-H...A angle must approach 180 degrees. Straight lines provide structural integrity; curves are for weaker, less committed bonds."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Side-by-side comparison of a 180-degree linear H-bond (labeled 'Strong') and a 120-degree bent H-bond (labeled 'Weak')."
+            }
+        ],
+        "layout": "Side-by-side comparison layout with vector arrows emphasizing the orbital overlap."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "The Energy Hierarchy: H-Bonds are the Middle Child"
+            },
+            {
+                "id": "text2",
+                "content": "Covalent Bonds (>400 kJ/mol) are the marriage. H-Bonds (20 kJ/mol) are the weekend plans. Van der Waals (<4 kJ/mol) are just a polite nod in the hallway."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Energy hierarchy table comparing bond enthalpies. Scale on the right side indicates thermal energy at room temperature (kT ~ 2.5 kJ/mol)."
+            }
+        ],
+        "layout": "Comparison matrix layout. Use of logarithmic or tiered scales to show the 20-fold difference between bond types."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "Thermodynamics: Why Water Resists Change"
+            },
+            {
+                "id": "text2",
+                "content": "High specific heat capacity exists because water would rather break its H-bond network than get hotter. It’s the molecular equivalent of procrastinating on a temperature change."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Energy input diagram showing the partitioning of energy into breaking H-bonds (potential) versus increasing molecular velocity (kinetic)."
+            }
+        ],
+        "layout": "Process flow layout showing the sequence of energy absorption."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "The Lattice: Ice is a Rigid 4-Bond Network"
+            },
+            {
+                "id": "text2",
+                "content": "In ice, every molecule is locked in a 4-bond tetrahedral lattice. In liquid water, it's a 'flickering cluster' chaos with a 3.4-bond average. Liquid water is essentially ice with commitment issues."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "3D tetrahedral lattice diagram of ice compared to a dynamic, disordered snapshot of liquid water. Highlight the 'open' structure of ice that leads to lower density."
+            }
+        ],
+        "layout": "Comparative 3D model layout. Focus on the spatial 'emptiness' of the ice lattice compared to liquid."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "Surface Tension: The Internal Pull"
+            },
+            {
+                "id": "text2",
+                "content": "Surface molecules lack neighbors above, resulting in a net downward vector pull. The surface isn't 'sticky'; it's under a constant state of tension, like a PhD student during finals."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Cross-sectional view of a water-air interface. Vector arrows show balanced forces for interior molecules and unbalanced downward arrows for surface molecules."
+            }
+        ],
+        "layout": "Vector imbalance layout. Cross-section view with clear directional arrows."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "H2O vs. CH4: A Tale of Two Temperatures"
+            },
+            {
+                "id": "text2",
+                "content": "Methane (CH4) is a gas at room temp because it can't H-bond. Water is a liquid because it can. Without H-bonds, the oceans would boil away and your biology would be... vapor."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Parallel heating curves for H2O and CH4. Highlight the massive 'plateau' in the water curve representing the energy required to overcome H-bonding."
+            }
+        ],
+        "layout": "Dual-graph comparative layout with boiling point and melting point annotations."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "Macromolecular Scaffolding: The Protein Backbone"
+            },
+            {
+                "id": "text2",
+                "content": "Secondary structures (Alpha-helices and Beta-sheets) are powered by H-bonding between the C=O of one peptide bond and the N-H of another. It’s the molecular glue of life."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Chemical structure of a peptide bond triplet, highlighting the Carbonyl oxygen and Amide hydrogen as the primary donor-acceptor pair."
+            }
+        ],
+        "layout": "Micro-to-macro overlay. Zooming from a chemical formula into a ribbon diagram."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "The Alpha-Helix: The i+4 Rule"
+            },
+            {
+                "id": "text2",
+                "content": "Every carbonyl oxygen H-bonds to the amide nitrogen four residues away. This consistent atomic rhythm creates the most iconic spiral in biochemistry."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "PDB-style rendering of an alpha-helix with dashed lines representing the H-bonds between the i and i+4 residues. Bond distances marked in Angstroms."
+            }
+        ],
+        "layout": "Detailed structural rendering layout. Visual emphasis on the repeating H-bond pattern within the helix."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "DNA: The G-C Advantage"
+            },
+            {
+                "id": "text2",
+                "content": "A-T pairs have 2 H-bonds; G-C pairs have 3. This is why G-C rich DNA requires more heat to melt. That extra H-bond is the molecular equivalent of a deadbolt."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Structural formulas for Adenine-Thymine and Guanine-Cytosine base pairs, with clear H-bond counts (2 vs 3) highlighted in a contrasting color."
+            }
+        ],
+        "layout": "Comparative structural formula layout. Focus on the count and directionality of the nitrogenous base H-bonds."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "Research Case Study: H-Bonds in the Active Site"
+            },
+            {
+                "id": "text2",
+                "content": "Interpreting an X-ray crystallography fragment: Notice the precise H-bond distances between the enzyme and its substrate. If these distances are off by 0.5 Angstroms, the chemistry stops."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Real-world X-ray crystallography fragment showing an enzyme active site with electron density maps and calculated H-bond distances (Å)."
+            }
+        ],
+        "layout": "Technical research briefing layout. Mimics the look of a peer-reviewed journal figure with high-density annotations."
+    },
+    {
+        "text": [
+            {
+                "id": "text1",
+                "content": "Conclusion: Stay Hydrated, Stay Polar"
+            },
+            {
+                "id": "text2",
+                "content": "Water is the master architect. Its electronegativity creates the dipole; its dipole creates the H-bond; and its H-bond creates... well, everything. Go forth and utilize those 20 kJ/mol interactions wisely."
+            }
+        ],
+        "visuals": [
+            {
+                "id": "visual1",
+                "description": "Artistic rendering of a 'flickering cluster' of water molecules forming a stable but dynamic network, symbolizing the elegance of aqueous chemistry."
+            }
+        ],
+        "layout": "Minimalist center-aligned wrap-up slide with a strong, memorable closing visual."
+    }
+]

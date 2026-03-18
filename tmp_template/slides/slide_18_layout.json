@@ -1,0 +1,97 @@
+{
+  "layout": "CUSTOM",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "The Hydrophobic Collapse",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 12.33,
+        "h": 0.7,
+        "style": {
+          "font_size": 36,
+          "alignment": "CENTER",
+          "color": "#2C3E50",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "Protein folding isn't about hydrophobic attraction; it's about the water's desire to be free. Aggregation releases the cages into the bulk liquid.",
+        "x": 1.0,
+        "y": 1.2,
+        "w": 11.33,
+        "h": 0.8,
+        "style": {
+          "font_size": 20,
+          "alignment": "CENTER",
+          "color": "#555555"
+        }
+      },
+      {
+        "type": "image",
+        "prompt": "Scientific illustration of scattered hydrophobic molecules in water, each surrounded by rigid, ordered clathrate water cages represented by blue geometric rings, molecular biology style, white background.",
+        "path": "before_collapse.png",
+        "x": 0.75,
+        "y": 2.5,
+        "w": 5.5,
+        "h": 3.5
+      },
+      {
+        "type": "image",
+        "prompt": "Scientific illustration of hydrophobic molecules clumped together in a central cluster, with surrounding water molecules shown as chaotic, moving freely and disordered, representing high entropy, molecular biology style, white background.",
+        "path": "after_collapse.png",
+        "x": 7.08,
+        "y": 2.5,
+        "w": 5.5,
+        "h": 3.5
+      },
+      {
+        "type": "textbox",
+        "text": "→",
+        "x": 6.25,
+        "y": 3.75,
+        "w": 0.83,
+        "h": 1.0,
+        "style": {
+          "font_size": 40,
+          "alignment": "CENTER",
+          "color": "#BDC3C7"
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "BEFORE: Scattered\n(Ordered Water Cages)",
+        "x": 0.75,
+        "y": 6.1,
+        "w": 5.5,
+        "h": 0.6,
+        "style": {
+          "font_size": 18,
+          "alignment": "CENTER",
+          "color": "#2C3E50",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "AFTER: Aggregated\n(Free Water / Higher Entropy)",
+        "x": 7.08,
+        "y": 6.1,
+        "w": 5.5,
+        "h": 0.6,
+        "style": {
+          "font_size": 18,
+          "alignment": "CENTER",
+          "color": "#2C3E50",
+          "bold": true
+        }
+      }
+    ]
+  },
+  "id": "slide_18"
+}

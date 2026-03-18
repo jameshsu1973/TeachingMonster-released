@@ -1,0 +1,56 @@
+{
+  "layout": "CUSTOM",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "The Solvation Problem: Clathrate Cages",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 12.33,
+        "h": 1.0,
+        "style": {
+          "font_size": 36,
+          "alignment": "LEFT",
+          "color": "#2C3E50",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "When water meets a nonpolar solute like Methane, it forms a highly ordered 'cage' to maintain its H-bonds. It's organized, but at a cost.",
+        "x": 0.5,
+        "y": 2.5,
+        "w": 5.0,
+        "h": 3.0,
+        "style": {
+          "font_size": 24,
+          "alignment": "LEFT",
+          "color": "#34495E"
+        }
+      },
+      {
+        "type": "image",
+        "prompt": "A high-quality 3D scientific visualization of a clathrate cage: water molecules forming a geometric, rigid hydrogen-bonded lattice around a central methane molecule. Studio lighting, white background, realistic molecular textures.",
+        "path": "clathrate_cage_model.png",
+        "x": 6.0,
+        "y": 1.5,
+        "w": 6.5,
+        "h": 5.0
+      },
+      {
+        "type": "shape",
+        "shape_type": "RECTANGLE",
+        "color": "#3498DB",
+        "x": 0.5,
+        "y": 1.4,
+        "w": 2.0,
+        "h": 0.05
+      }
+    ]
+  },
+  "id": "slide_16"
+}

@@ -1,0 +1,61 @@
+{
+  "layout": "CUSTOM",
+  "style": {
+    "background": "#0B0E14"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "Conclusion: Stay Solvent, Stay Hydrated",
+        "x": 0.5,
+        "y": 0.8,
+        "w": 12.33,
+        "h": 1.0,
+        "style": {
+          "font_size": 40,
+          "alignment": "CENTER",
+          "color": "#FFFFFF",
+          "bold": true
+        }
+      },
+      {
+        "type": "image",
+        "prompt": "A single, perfect 3D water molecule shimmering with realistic refraction, centered on a deep black 'research-mode' background, cinematic lighting, ultra-high definition, minimalist aesthetic.",
+        "path": "images/water_molecule_final.png",
+        "x": 4.165,
+        "y": 2.0,
+        "w": 5.0,
+        "h": 3.5
+      },
+      {
+        "type": "textbox",
+        "text": "You now understand the molecular mechanics that keep your proteins folded and your ice floating. Go forth and use this knowledge responsibly.",
+        "x": 1.665,
+        "y": 5.7,
+        "w": 10.0,
+        "h": 0.8,
+        "style": {
+          "font_size": 20,
+          "alignment": "CENTER",
+          "color": "#CCCCCC"
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "CLASS DISMISSED",
+        "x": 0.5,
+        "y": 6.7,
+        "w": 12.33,
+        "h": 0.5,
+        "style": {
+          "font_size": 28,
+          "alignment": "CENTER",
+          "color": "#4A90E2",
+          "bold": true
+        }
+      }
+    ]
+  },
+  "id": "slide_20"
+}

@@ -72,10 +72,16 @@ class VideoGenerationPipeline:
         # Define sub-directories for intermediate assets
         self.slides_output_root = os.path.join(tmp_dir, "slides")
         self.tts_output_root = os.path.join(tmp_dir, "tts")
-        self.cursor_output_root = os.path.join(tmp_dir, "cursor")
-
-        self.video_output_path = os.path.join(final_dir, output_video_name)
+        # self.cursor_output_root = os.path.join(tmp_dir, "cursor")  # TEMPORARILY DISABLED
+        # self.cursor_module = CursorModule(
+        #     output_root=self.cursor_output_root, 
+        #     final_root=final_dir, 
+        #     final_video_name=output_video_name
+        # )
         os.makedirs(final_dir, exist_ok=True)
+
+        # add output video path
+        self.video_output_path = os.path.join(tmp_dir, "output.mp4")
 
         self.fps = 15
 
@@ -95,11 +101,11 @@ class VideoGenerationPipeline:
             self.wrapper = Wrapper_3B1B(llm_client)
             
         self.tts_module = TTSModule(output_root=self.tts_output_root)
-        self.cursor_module = CursorModule(
-            output_root=self.cursor_output_root, 
-            final_root=final_dir, 
-            final_video_name=output_video_name
-        )
+        # self.cursor_module = CursorModule(
+        #     output_root=self.cursor_output_root, 
+        #     final_root=final_dir, 
+        #     final_video_name=output_video_name
+        # )
 
     def load(self):
         """
@@ -110,12 +116,14 @@ class VideoGenerationPipeline:
         self.wrapper.load()
         self.slides_module.load()
         self.tts_module.load()
-        self.cursor_module.load()
+        # self.cursor_module.load()
 
     def run(
         self,
         requirement_prompt: str,
         persona_prompt: str,
+        use_existing_slides: bool = False,  # NEW: Flag to use existing slides
+        existing_slides_dir: str = "./tmp_template",  # NEW: Directory with existing slides
     ) -> dict:
         """
         Orchestrates the full generation process from text to MP4.
@@ -123,6 +131,8 @@ class VideoGenerationPipeline:
         Args:
             requirement_prompt: The core topic or instruction.
             persona_prompt: The tone/style of the presentation (e.g., "Academic").
+            use_existing_slides: If True, skip PPT generation and use existing JPGs.
+            existing_slides_dir: Directory containing existing slide images.
 
         Returns:
             dict: A dictionary containing paths and data for all generated assets.
@@ -149,13 +159,30 @@ class VideoGenerationPipeline:
         # =============================
         # Step 3: Visual Asset Generation
         # Renders the slides into image files.
+        # MODIFIED: Support using existing slides from tmp_template
         # =============================
-        slides_folder = self.slides_module.run(slides_struct)
+        if use_existing_slides and os.path.exists(existing_slides_dir):
+            print(f"[INFO] Using existing slides from: {existing_slides_dir}")
+            slides_folder = existing_slides_dir
+            # Verify that expected image files exist
+            expected_count = len(slides_struct)
+            existing_files = [f for f in os.listdir(existing_slides_dir) if f.endswith('.jpg') or f.endswith('.png')]
+            print(f"[INFO] Found {len(existing_files)} image files in {existing_slides_dir}")
+            if len(existing_files) < expected_count:
+                print(f"[WARNING] Expected {expected_count} slides but found {len(existing_files)}")
+        else:
+            print("[INFO] Generating slides via API...")
+            slides_folder = self.slides_module.run(slides_struct)
 
         slide_images: List[Image.Image] = []
         slide_image_paths: List[str] = []
         for idx in range(1, len(slides_struct) + 1):
             img_path = os.path.join(slides_folder, f"{idx}.jpg")
+            # Also check for .png if .jpg doesn't exist
+            if not os.path.exists(img_path):
+                png_path = os.path.join(slides_folder, f"{idx}.png")
+                if os.path.exists(png_path):
+                    img_path = png_path
             slide_image_paths.append(img_path)
             slide_images.append(Image.open(img_path))
 
@@ -163,7 +190,7 @@ class VideoGenerationPipeline:
         # Step 4: Audio Synthesis
         # Generates narration and precise word-level timings for cursor syncing.
         # =============================
-        audio_folder, word_timings = self.tts_module.run(scripts)
+        audio_folder, word_timings, *_extra = self.tts_module.run(scripts)
         json.dump(word_timings, open("tmp/word_timings.json", "w+", encoding="utf-8"), ensure_ascii=False, indent=4)
 
         audio_paths: List[str] = [
@@ -174,12 +201,12 @@ class VideoGenerationPipeline:
         # Step 5: Animation Planning
         # Calculates where the "laser pointer" (cursor) should move based on keywords.
         # =============================
-        cursor_script, cursor_data = self.cursor_module.run(
-            images=slide_images,
-            scripts=scripts,
-            timestamps=word_timings,
-            audio_paths=audio_paths,
-        )
+        # cursor_script, cursor_data = self.cursor_module.run(
+        #     images=slide_images,
+        #     scripts=scripts,
+        #     timestamps=word_timings,
+        #     audio_paths=audio_paths,
+        # )
 
         # =============================
         # Step 6: Built-in Video Rendering (MoviePy)
@@ -199,9 +226,9 @@ class VideoGenerationPipeline:
             base_clip = ImageClip(img_path).set_duration(slide_duration)
 
             # Create the cursor layer (a 20x20 red square/dot)
-            cursor_img = np.zeros((20, 20, 3), dtype=np.uint8)
-            cursor_img[:, :] = (255, 0, 0) # Red dot
-            cursor_clip = ImageClip(cursor_img).set_duration(slide_duration)
+            # cursor_img = np.zeros((20, 20, 3), dtype=np.uint8)
+            # cursor_img[:, :] = (255, 0, 0) # Red dot
+            # cursor_clip = ImageClip(cursor_img).set_duration(slide_duration)
 
             # --- Cursor Path Calculation ---
             # Handles smooth interpolation between different focus points on a slide.
@@ -209,33 +236,33 @@ class VideoGenerationPipeline:
             CURSOR_MOVE_FRAME = 10
             prev_x, prev_y = None, None
             word_cnt = 0
-            grouped_script = cursor_script[slide_idx]
-            grouped_point = cursor_data[slide_idx]
+            # grouped_script = cursor_script[slide_idx]
+            # grouped_point = cursor_data[slide_idx]
             timestamps = word_timings[slide_idx]
 
-            positions = [] # List of (time, (x, y)) tuples
+            # positions = [] # List of (time, (x, y)) tuples
 
-            for group_idx, (script, (x, y)) in enumerate(zip(grouped_script, grouped_point)):
-                start_time = 0.0 if word_cnt == 0 else timestamps[word_cnt][0]
+            # for group_idx, (script, (x, y)) in enumerate(zip(grouped_script, grouped_point)):
+            #     start_time = 0.0 if word_cnt == 0 else timestamps[word_cnt][0]
 
-                # If moving from a previous point, interpolate coordinates for smoothness
-                if prev_x is not None and prev_y is not None:
-                    vec_x = (x - prev_x) / CURSOR_MOVE_FRAME
-                    vec_y = (y - prev_y) / CURSOR_MOVE_FRAME
+            #     # If moving from a previous point, interpolate coordinates for smoothness
+            #     if prev_x is not None and prev_y is not None:
+            #         vec_x = (x - prev_x) / CURSOR_MOVE_FRAME
+            #         vec_y = (y - prev_y) / CURSOR_MOVE_FRAME
 
-                    for frame_i in range(CURSOR_MOVE_FRAME):
-                        t = start_time + frame_i * (CURSOR_MOVE_TIME / CURSOR_MOVE_FRAME)
-                        pos_x = int(prev_x + frame_i * vec_x)
-                        pos_y = int(prev_y + frame_i * vec_y)
-                        positions.append((t, (pos_x, pos_y)))
+            #         for frame_i in range(CURSOR_MOVE_FRAME):
+            #             t = start_time + frame_i * (CURSOR_MOVE_TIME / CURSOR_MOVE_FRAME)
+            #             pos_x = int(prev_x + frame_i * vec_x)
+            #             pos_y = int(prev_y + frame_i * vec_y)
+            #             positions.append((t, (pos_x, pos_y)))
 
-                    start_time += CURSOR_MOVE_TIME
+            #         start_time += CURSOR_MOVE_TIME
 
-                # Calculate end-time for this specific word group
-                word_cnt += len(script.split())
-                prev_x, prev_y = x, y
-                end_t = timestamps[word_cnt - 1][1] if word_cnt - 1 < len(timestamps) else slide_duration
-                positions.append((end_t, (x, y)))
+            #     # Calculate end-time for this specific word group
+            #     word_cnt += len(script.split())
+            #     prev_x, prev_y = x, y
+            #     end_t = timestamps[word_cnt - 1][1] if word_cnt - 1 < len(timestamps) else slide_duration
+            #     positions.append((end_t, (x, y)))
 
             # Function to interpolate the cursor's position at any given timestamp 't'
             def make_position_fn(positions):
@@ -247,8 +274,11 @@ class VideoGenerationPipeline:
                 return pos_fn
 
             # Overlay cursor on slide and attach audio
-            cursor_clip = cursor_clip.set_position(make_position_fn(positions))
-            video_clips.append(CompositeVideoClip([base_clip, cursor_clip]).set_audio(audio_clip))
+            # cursor_clip = cursor_clip.set_position(make_position_fn(positions))
+            # video_clips.append(CompositeVideoClip([base_clip, cursor_clip]).set_audio(audio_clip))
+            
+            # --- USE ONLY BASE SLIDE + AUDIO (NO CURSOR) ---
+            video_clips.append(base_clip.set_audio(audio_clip))
 
         # Merge all individual slide clips and encode to MP4
         final_video = concatenate_videoclips(video_clips, method="compose")
@@ -276,7 +306,7 @@ class VideoGenerationPipeline:
             "scripts": scripts,
             "audio_folder": audio_folder,
             "word_timings": word_timings,
-            "cursor_data": cursor_data,
+            # "cursor_data": cursor_data,
             "final_video_path": self.video_output_path,
         }
 
@@ -330,12 +360,29 @@ if __name__ == "__main__":
         help="Directory for final video output (overrides config if provided)",
     )
 
+    # NEW: Add argument for using existing slides
+    parser.add_argument(
+        "--use-existing-slides",
+        action="store_true",
+        help="Use existing slide images from tmp_template instead of generating new ones",
+    )
+
+    parser.add_argument(
+        "--existing-slides-dir",
+        type=str,
+        default="./tmp_template",
+        help="Directory containing existing slide images (default: ./tmp_template)",
+    )
+
     args = parser.parse_args()
 
     print("\n=== Input ===")
     print(f"Requirement prompt: {args.requirement_prompt}")
     print(f"Persona prompt: {args.persona_prompt}")
     print(f"Config path: {args.config}")
+    print(f"Use existing slides: {args.use_existing_slides}")
+    if args.use_existing_slides:
+        print(f"Existing slides dir: {args.existing_slides_dir}")
 
     print("\n=== Loading ===")
     with open(args.config, encoding="utf-8") as f:
@@ -357,6 +404,8 @@ if __name__ == "__main__":
     assets = pipeline.run(
         requirement_prompt=args.requirement_prompt,
         persona_prompt=args.persona_prompt,
+        use_existing_slides=args.use_existing_slides,
+        existing_slides_dir=args.existing_slides_dir,
     )
 
     print("\n=== Final Output ===")

@@ -1,0 +1,68 @@
+{
+  "layout": "CUSTOM",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "Vector Analysis of the Dipole",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 12.33,
+        "h": 0.8,
+        "style": {
+          "font_size": 36,
+          "alignment": "CENTER",
+          "bold": true,
+          "color": "#2C3E50"
+        }
+      },
+      {
+        "type": "image",
+        "prompt": "A minimalist 3D water molecule model (H2O) showing a central red oxygen atom and two white hydrogen atoms. Superimposed are blue arrows representing individual O-H bond dipole vectors and one large, bold purple arrow representing the net molecular dipole moment vector pointing upwards through the oxygen. Scientific, clean, white background.",
+        "path": "images/water_dipole_vectors.png",
+        "x": 0.5,
+        "y": 1.5,
+        "w": 6.0,
+        "h": 5.5
+      },
+      {
+        "type": "textbox",
+        "text": "Electronegativity creates the drama. With Oxygen at 3.44 and Hydrogen at 2.20, the difference in electron affinity generates significant bond dipoles. These vectors do not cancel due to the bent molecular geometry (104.5°).",
+        "x": 6.83,
+        "y": 1.5,
+        "w": 5.5,
+        "h": 2.5,
+        "style": {
+          "font_size": 22,
+          "alignment": "LEFT",
+          "color": "#34495E"
+        }
+      },
+      {
+        "type": "shape",
+        "shape_type": "RECTANGLE",
+        "color": "#F8F9FA",
+        "x": 6.83,
+        "y": 4.2,
+        "w": 5.5,
+        "h": 2.0
+      },
+      {
+        "type": "math",
+        "latex": "\\vec{\\mu}_{net} = \\sum \\vec{\\mu}_{bond} \\approx 1.85\\text{ D}",
+        "x": 7.0,
+        "y": 4.5,
+        "w": 5.16,
+        "h": 1.4,
+        "style": {
+          "font_size": 32,
+          "color": "#2980B9"
+        }
+      }
+    ]
+  },
+  "id": "slide_5"
+}

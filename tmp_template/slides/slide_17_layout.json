@@ -1,0 +1,110 @@
+{
+  "layout": "CUSTOM",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "The Entropy Penalty",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 12.33,
+        "h": 0.8,
+        "style": {
+          "font_size": 40,
+          "alignment": "CENTER",
+          "bold": true,
+          "color": "#2C3E50"
+        }
+      },
+      {
+        "type": "math",
+        "latex": "-\\Delta S",
+        "x": 5.16,
+        "y": 1.3,
+        "w": 3.0,
+        "h": 1.0,
+        "style": {
+          "font_size": 54,
+          "color": "#C0392B"
+        }
+      },
+      {
+        "type": "image",
+        "prompt": "Scientific 3D molecular diagram of a water clathrate cage, highly ordered hexagonal and pentagonal hydrogen-bonded structure, crystalline and rigid, blue aesthetic.",
+        "path": "clathrate_ordered.png",
+        "x": 1.0,
+        "y": 2.5,
+        "w": 5.0,
+        "h": 3.2
+      },
+      {
+        "type": "image",
+        "prompt": "Scientific 3D molecular diagram of liquid bulk water, molecules in random, chaotic orientations, high motion, dynamic hydrogen bonding, warm aesthetic.",
+        "path": "bulk_water_disordered.png",
+        "x": 7.33,
+        "y": 2.5,
+        "w": 5.0,
+        "h": 3.2
+      },
+      {
+        "type": "textbox",
+        "text": "LOW ENTROPY (Ordered)",
+        "x": 1.0,
+        "y": 5.7,
+        "w": 5.0,
+        "h": 0.4,
+        "style": {
+          "font_size": 18,
+          "alignment": "CENTER",
+          "color": "#2980B9",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "HIGH ENTROPY (Disordered)",
+        "x": 7.33,
+        "y": 5.7,
+        "w": 5.0,
+        "h": 0.4,
+        "style": {
+          "font_size": 18,
+          "alignment": "CENTER",
+          "color": "#E67E22",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "Ordering water into cages is entropically expensive. Thermodynamics hates a clean room; it wants maximum disorder.",
+        "x": 1.0,
+        "y": 6.3,
+        "w": 11.33,
+        "h": 0.8,
+        "style": {
+          "font_size": 22,
+          "alignment": "CENTER",
+          "italic": true,
+          "color": "#34495E"
+        }
+      },
+      {
+        "type": "shape",
+        "shape_type": "RECTANGLE",
+        "color": "#C0392B",
+        "text": "ENERGY COST",
+        "x": 5.9,
+        "y": 3.8,
+        "w": 1.5,
+        "h": 0.4,
+        "style": {
+          "font_size": 12
+        }
+      }
+    ]
+  },
+  "id": "slide_17"
+}
