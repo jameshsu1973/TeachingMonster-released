@@ -13,6 +13,10 @@ need to download LibreOffice for doing pptx to jpg
 
 * This project uses **Python 3.10**, and needs libreoffice & poppler to be installed. The installation subjects to the OS.
 
+```bash
+conda activate monster
+```
+
 * Install dependencies:
 
    ```bash
@@ -29,6 +33,6 @@ python -m scripts.T2V_pipeline \
   [-d ./output]
 ```
 
-python -m scripts.T2V_pipeline  -r "Topic: Chemistry of Life - Structure of water and hydrogen bonding"   -p "Education Level: University | Learning Motivation: Research papers | Timeline Urgency: Urgent"   -c config/default.yaml   -o my_video.mp4   -d ./output 
+python -m scripts.T2V_pipeline  -r "Topic: Chemistry of Life - Structure of water and hydrogen bonding"   -p "Education Level: University | Learning Motivation: Research papers | Timeline Urgency: Urgent"   -c config/default.yaml   -o my_video.mp4   -d ./output --skip-steps-123 --existing-slides-dir ./tmp_template
 
-python -m scripts.T2V_pipeline  -r "Topic: Chemistry of Life - Structure of water and hydrogen bonding"   -p "Education Level: University | Learning Motivation: Research papers | Timeline Urgency: Urgent"   -c config/default.yaml   -o my_video.mp4   -d ./output --use-existing-slides
+python -m scripts.T2V_pipeline  -r "Topic: Confidence Intervals for the Slope of a Regression Model learning"   -p "Education Level: Senior high school | Learning Pace: Slow | Preferred Explanation Style: Examples | Learning Motivation: Job hunting | Depth Preference: Application-first"   -c config/default.yaml   -o my_video.mp4   -d ./output

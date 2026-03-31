@@ -138,3 +138,4 @@ websockets==15.0.1
 xlsxwriter==3.2.9
 
 bitsandbytes accelerate
+fish-audio-sdk

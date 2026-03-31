@@ -72,16 +72,10 @@ class VideoGenerationPipeline:
         # Define sub-directories for intermediate assets
         self.slides_output_root = os.path.join(tmp_dir, "slides")
         self.tts_output_root = os.path.join(tmp_dir, "tts")
-        # self.cursor_output_root = os.path.join(tmp_dir, "cursor")  # TEMPORARILY DISABLED
-        # self.cursor_module = CursorModule(
-        #     output_root=self.cursor_output_root, 
-        #     final_root=final_dir, 
-        #     final_video_name=output_video_name
-        # )
         os.makedirs(final_dir, exist_ok=True)
+        self.final_dir = final_dir
 
-        # add output video path
-        self.video_output_path = os.path.join(tmp_dir, "output.mp4")
+        self.video_output_path = os.path.join(final_dir, output_video_name)
 
         self.fps = 15
 
@@ -100,30 +94,41 @@ class VideoGenerationPipeline:
             )
             self.wrapper = Wrapper_3B1B(llm_client)
             
-        self.tts_module = TTSModule(output_root=self.tts_output_root)
-        # self.cursor_module = CursorModule(
-        #     output_root=self.cursor_output_root, 
-        #     final_root=final_dir, 
-        #     final_video_name=output_video_name
-        # )
+        self.tts_module = TTSModule(
+            output_root=self.tts_output_root,
+            tts_instruct="",  # 明確設為空字串，抑制非預期音效（如笑聲）
+            tts_instruct_first="",  # 第一段也使用相同 neutral 指令，避免開頭過度活躍、後半段突兀
+            slide_head_silence_ms=600.0,  # 投影片開頭停頓 0.6 秒
+            slide_tail_silence_ms=1500.0,  # 投影片結尾停頓 1.5 秒，讓間隔更明確
+            # ── 速度優化參數（與 tts.py 對齊）──
+            use_torch_compile=True,      # torch.compile 加速首生成（預設開啟）
+            # parallel_slides=4,           # 投影片 TTS + ASR 並行數
+            # parallel_asr=True,           # ASR 與下一張 TTS 重疊執行
+            # asr_beam_size=5,             # 調高 beam_size 加速 ASR
+        )
 
-    def load(self):
+    def load(self, skip_steps_123: bool = False):
         """
         Initializes heavy resources (e.g., local ML models, network connections).
         Must be called after __init__ and before run().
+
+        Args:
+            skip_steps_123: If True, skip loading outline/wrapper/slides modules.
         """
-        self.outline_module.load()
-        self.wrapper.load()
-        self.slides_module.load()
+        if not skip_steps_123:
+            self.outline_module.load()
+            self.wrapper.load()
+            self.slides_module.load()
         self.tts_module.load()
-        # self.cursor_module.load()
 
     def run(
         self,
         requirement_prompt: str,
         persona_prompt: str,
-        use_existing_slides: bool = False,  # NEW: Flag to use existing slides
-        existing_slides_dir: str = "./tmp_template",  # NEW: Directory with existing slides
+        use_existing_slides: bool = False,
+        existing_slides_dir: str = "./tmp_template",
+        skip_steps_123: bool = False,
+        cache_dir: str = "./tmp",
     ) -> dict:
         """
         Orchestrates the full generation process from text to MP4.
@@ -133,6 +138,8 @@ class VideoGenerationPipeline:
             persona_prompt: The tone/style of the presentation (e.g., "Academic").
             use_existing_slides: If True, skip PPT generation and use existing JPGs.
             existing_slides_dir: Directory containing existing slide images.
+            skip_steps_123: If True, load outlines/scripts/slides_struct from cache_dir.
+            cache_dir: Directory containing cached JSON files (default: ./tmp).
 
         Returns:
             dict: A dictionary containing paths and data for all generated assets.
@@ -140,34 +147,55 @@ class VideoGenerationPipeline:
 
         # =============================
         # Step 1: Content Planning
-        # Generates a high-level structure of the video.
         # =============================
-        outlines: List[str] = self.outline_module.run(
-            requirement_prompt=requirement_prompt,
-            persona_prompt=persona_prompt,
-        )
-        json.dump(outlines, open("tmp/outlines.json", "w+", encoding="utf-8"), ensure_ascii=False, indent=4)
+        outlines_path = os.path.join(cache_dir, "outlines.json")
+        if skip_steps_123 and os.path.exists(outlines_path):
+            print(f"[INFO] Loading cached outlines from: {outlines_path}")
+            with open(outlines_path, encoding="utf-8") as f:
+                outlines = json.load(f)
+        else:
+            print("[INFO] Generating outlines via API...")
+            outlines: List[str] = self.outline_module.run(
+                requirement_prompt=requirement_prompt,
+                persona_prompt=persona_prompt,
+            )
+            os.makedirs(cache_dir, exist_ok=True)
+            json.dump(outlines, open(outlines_path, "w+", encoding="utf-8"), ensure_ascii=False, indent=4)
 
         # =============================
         # Step 2: Content Interpretation
-        # Breaks outlines into slide-by-slide structure and narration scripts.
         # =============================
-        slides_struct, scripts = self.wrapper.run(outlines)
-        json.dump(slides_struct, open("tmp/slides_struct.json", "w+", encoding="utf-8"), ensure_ascii=False, indent=4)
-        json.dump(scripts, open("tmp/scripts.json", "w+", encoding="utf-8"), ensure_ascii=False, indent=4)
+        slides_struct_path = os.path.join(cache_dir, "slides_struct.json")
+        scripts_path = os.path.join(cache_dir, "scripts.json")
+        if skip_steps_123 and os.path.exists(slides_struct_path) and os.path.exists(scripts_path):
+            print(f"[INFO] Loading cached slides_struct from: {slides_struct_path}")
+            print(f"[INFO] Loading cached scripts from: {scripts_path}")
+            with open(slides_struct_path, encoding="utf-8") as f:
+                slides_struct = json.load(f)
+            with open(scripts_path, encoding="utf-8") as f:
+                scripts = json.load(f)
+        else:
+            print("[INFO] Generating slides specs and scripts via API...")
+            slides_struct, scripts = self.wrapper.run(outlines)
+            os.makedirs(cache_dir, exist_ok=True)
+            json.dump(slides_struct, open(slides_struct_path, "w+", encoding="utf-8"), ensure_ascii=False, indent=4)
+            json.dump(scripts, open(scripts_path, "w+", encoding="utf-8"), ensure_ascii=False, indent=4)
 
         # =============================
         # Step 3: Visual Asset Generation
-        # Renders the slides into image files.
-        # MODIFIED: Support using existing slides from tmp_template
         # =============================
-        if use_existing_slides and os.path.exists(existing_slides_dir):
-            print(f"[INFO] Using existing slides from: {existing_slides_dir}")
-            slides_folder = existing_slides_dir
-            # Verify that expected image files exist
+        if use_existing_slides or skip_steps_123:
+            # When skip_steps_123 is True, always use existing slides
+            slides_dir = existing_slides_dir if use_existing_slides else existing_slides_dir
+            if not os.path.isdir(slides_dir):
+                print(f"[ERROR] Slides directory '{slides_dir}' does not exist.")
+                return None
+            print(f"[INFO] Using existing slides from: {slides_dir}")
+            slides_folder = slides_dir
+            
             expected_count = len(slides_struct)
-            existing_files = [f for f in os.listdir(existing_slides_dir) if f.endswith('.jpg') or f.endswith('.png')]
-            print(f"[INFO] Found {len(existing_files)} image files in {existing_slides_dir}")
+            existing_files = [f for f in os.listdir(slides_dir) if f.lower().endswith(('.jpg', '.png'))]
+            print(f"[INFO] Found {len(existing_files)} image files in {slides_dir}")
             if len(existing_files) < expected_count:
                 print(f"[WARNING] Expected {expected_count} slides but found {len(existing_files)}")
         else:
@@ -178,7 +206,6 @@ class VideoGenerationPipeline:
         slide_image_paths: List[str] = []
         for idx in range(1, len(slides_struct) + 1):
             img_path = os.path.join(slides_folder, f"{idx}.jpg")
-            # Also check for .png if .jpg doesn't exist
             if not os.path.exists(img_path):
                 png_path = os.path.join(slides_folder, f"{idx}.png")
                 if os.path.exists(png_path):
@@ -188,29 +215,20 @@ class VideoGenerationPipeline:
 
         # =============================
         # Step 4: Audio Synthesis
-        # Generates narration and precise word-level timings for cursor syncing.
         # =============================
         audio_folder, word_timings, *_extra = self.tts_module.run(scripts)
-        json.dump(word_timings, open("tmp/word_timings.json", "w+", encoding="utf-8"), ensure_ascii=False, indent=4)
+        json.dump(word_timings, open(os.path.join(cache_dir, "word_timings.json"), "w+", encoding="utf-8"), ensure_ascii=False, indent=4)
 
         audio_paths: List[str] = [
             os.path.join(audio_folder, f"{i}.mp3") for i in range(1, len(scripts) + 1)
         ]
 
         # =============================
-        # Step 5: Animation Planning
-        # Calculates where the "laser pointer" (cursor) should move based on keywords.
+        # Step 5: Animation Planning (DISABLED)
         # =============================
-        # cursor_script, cursor_data = self.cursor_module.run(
-        #     images=slide_images,
-        #     scripts=scripts,
-        #     timestamps=word_timings,
-        #     audio_paths=audio_paths,
-        # )
 
         # =============================
         # Step 6: Built-in Video Rendering (MoviePy)
-        # Composites visual and audio layers into the final video file.
         # =============================
         video_clips = []
 
@@ -218,65 +236,11 @@ class VideoGenerationPipeline:
             img_path = slide_image_paths[slide_idx]
             audio_path = audio_paths[slide_idx]
             
-            # Load audio to determine the exact duration of this slide segment
             audio_clip = AudioFileClip(audio_path).set_fps(44100)
             slide_duration = audio_clip.duration
 
-            # Create the background slide layer
             base_clip = ImageClip(img_path).set_duration(slide_duration)
 
-            # Create the cursor layer (a 20x20 red square/dot)
-            # cursor_img = np.zeros((20, 20, 3), dtype=np.uint8)
-            # cursor_img[:, :] = (255, 0, 0) # Red dot
-            # cursor_clip = ImageClip(cursor_img).set_duration(slide_duration)
-
-            # --- Cursor Path Calculation ---
-            # Handles smooth interpolation between different focus points on a slide.
-            CURSOR_MOVE_TIME = 0.4
-            CURSOR_MOVE_FRAME = 10
-            prev_x, prev_y = None, None
-            word_cnt = 0
-            # grouped_script = cursor_script[slide_idx]
-            # grouped_point = cursor_data[slide_idx]
-            timestamps = word_timings[slide_idx]
-
-            # positions = [] # List of (time, (x, y)) tuples
-
-            # for group_idx, (script, (x, y)) in enumerate(zip(grouped_script, grouped_point)):
-            #     start_time = 0.0 if word_cnt == 0 else timestamps[word_cnt][0]
-
-            #     # If moving from a previous point, interpolate coordinates for smoothness
-            #     if prev_x is not None and prev_y is not None:
-            #         vec_x = (x - prev_x) / CURSOR_MOVE_FRAME
-            #         vec_y = (y - prev_y) / CURSOR_MOVE_FRAME
-
-            #         for frame_i in range(CURSOR_MOVE_FRAME):
-            #             t = start_time + frame_i * (CURSOR_MOVE_TIME / CURSOR_MOVE_FRAME)
-            #             pos_x = int(prev_x + frame_i * vec_x)
-            #             pos_y = int(prev_y + frame_i * vec_y)
-            #             positions.append((t, (pos_x, pos_y)))
-
-            #         start_time += CURSOR_MOVE_TIME
-
-            #     # Calculate end-time for this specific word group
-            #     word_cnt += len(script.split())
-            #     prev_x, prev_y = x, y
-            #     end_t = timestamps[word_cnt - 1][1] if word_cnt - 1 < len(timestamps) else slide_duration
-            #     positions.append((end_t, (x, y)))
-
-            # Function to interpolate the cursor's position at any given timestamp 't'
-            def make_position_fn(positions):
-                def pos_fn(t):
-                    for i in range(len(positions) - 1):
-                        if positions[i][0] <= t < positions[i+1][0]:
-                            return positions[i][1]
-                    return positions[-1][1]
-                return pos_fn
-
-            # Overlay cursor on slide and attach audio
-            # cursor_clip = cursor_clip.set_position(make_position_fn(positions))
-            # video_clips.append(CompositeVideoClip([base_clip, cursor_clip]).set_audio(audio_clip))
-            
             # --- USE ONLY BASE SLIDE + AUDIO (NO CURSOR) ---
             video_clips.append(base_clip.set_audio(audio_clip))
 
@@ -306,7 +270,6 @@ class VideoGenerationPipeline:
             "scripts": scripts,
             "audio_folder": audio_folder,
             "word_timings": word_timings,
-            # "cursor_data": cursor_data,
             "final_video_path": self.video_output_path,
         }
 
@@ -321,57 +284,44 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "-r",
-        "--requirement-prompt",
-        type=str,
-        default="Explain machine learning basics",
-        help="Main requirement prompt (e.g., 'Explain machine learning basics')",
+        "-r", "--requirement-prompt",
+        type=str, default="Explain machine learning basics",
+        help="Main requirement prompt",
     )
-
     parser.add_argument(
-        "-p",
-        "--persona-prompt",
-        type=str,
-        default="Friendly instructor",
-        help="Persona prompt (e.g., 'Friendly instructor')",
+        "-p", "--persona-prompt",
+        type=str, default="Friendly instructor",
+        help="Persona prompt",
     )
-
     parser.add_argument(
-        "-c",
-        "--config",
-        type=str,
-        default="config/default.yaml",
-        help="Generation config (e.g., config/default.yaml)",
+        "-c", "--config",
+        type=str, default="config/default.yaml",
+        help="Generation config",
     )
-
     parser.add_argument(
-        "-o",
-        "--output-video-name",
-        type=str,
-        default="final_video.mp4",
-        help="Output video file name (e.g., final_video.mp4)",
+        "-o", "--output-video-name",
+        type=str, default="final_video.mp4",
+        help="Output video file name",
     )
-
     parser.add_argument(
-        "-d",
-        "--final-video-dir",
-        type=str,
-        default=None,
-        help="Directory for final video output (overrides config if provided)",
+        "-d", "--final-video-dir",
+        type=str, default=None,
+        help="Directory for final video output",
     )
-
-    # NEW: Add argument for using existing slides
     parser.add_argument(
         "--use-existing-slides",
         action="store_true",
-        help="Use existing slide images from tmp_template instead of generating new ones",
+        help="Use existing slide images instead of generating new ones",
     )
-
     parser.add_argument(
         "--existing-slides-dir",
-        type=str,
-        default="./tmp_template",
+        type=str, default="./tmp_template",
         help="Directory containing existing slide images (default: ./tmp_template)",
+    )
+    parser.add_argument(
+        "--skip-steps-123",
+        action="store_true",
+        help="Skip Steps 1-3 (outline, wrapper, slides) and use cached files from tmp/",
     )
 
     args = parser.parse_args()
@@ -381,8 +331,7 @@ if __name__ == "__main__":
     print(f"Persona prompt: {args.persona_prompt}")
     print(f"Config path: {args.config}")
     print(f"Use existing slides: {args.use_existing_slides}")
-    if args.use_existing_slides:
-        print(f"Existing slides dir: {args.existing_slides_dir}")
+    print(f"Skip steps 1-3: {args.skip_steps_123}")
 
     print("\n=== Loading ===")
     with open(args.config, encoding="utf-8") as f:
@@ -398,7 +347,7 @@ if __name__ == "__main__":
         final_video_dir=args.final_video_dir,
     )
 
-    pipeline.load()
+    pipeline.load(skip_steps_123=args.skip_steps_123)
 
     print("\n=== Run ===")
     assets = pipeline.run(
@@ -406,7 +355,11 @@ if __name__ == "__main__":
         persona_prompt=args.persona_prompt,
         use_existing_slides=args.use_existing_slides,
         existing_slides_dir=args.existing_slides_dir,
+        skip_steps_123=args.skip_steps_123,
     )
 
-    print("\n=== Final Output ===")
-    print("Final video:", assets["final_video_path"])
+    if assets:
+        print("\n=== Final Output ===")
+        print("Final video:", assets["final_video_path"])
+    else:
+        print("\n[ERROR] Pipeline failed.")
