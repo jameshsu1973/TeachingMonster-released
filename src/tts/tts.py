@@ -494,16 +494,16 @@ class TTSModule:
 
     def _gen_qwen(self, text: str, wav_path: Path, final_path: Path):
         import soundfile as sf
+        import torch
+        import shutil
+        import subprocess
 
         chunks = self._split_text_for_tts(text)
         if not chunks:
             self._create_silent_audio(final_path, 0.25)
             return
 
-        # ── Build per-chunk instructs ──
-        # 第一個 chunk 用 tts_instruct_first（若有），否則用 tts_instruct
         first_instruct = self.tts_instruct_first if self.tts_instruct_first is not None else self.tts_instruct
-        # 後續 chunk 用 tts_instruct（若無則用空字串，表示 neutral）
         rest_instruct = self.tts_instruct if self.tts_instruct is not None else ""
 
         if len(chunks) == 1:
@@ -520,14 +520,10 @@ class TTSModule:
                 "language": [self.language] * len(chunks),
                 "speaker": [self.speaker] * len(chunks),
             }
-            # 構建 instruct list: 第一個用 first_instruct（若無則空字串），後續用 rest_instruct
             instructs = [first_instruct if first_instruct is not None else ""] + [rest_instruct] * (len(chunks) - 1)
-            # 如果全部都是空字串，可以不傳；但傳空通常沒問題
             kwargs["instruct"] = instructs
 
-        # 動態調整 max_new_tokens，避免單次生成過長消耗過多 GPU 資源
         gen_kwargs = self.generation_kwargs.copy()
-        # 粗略估計：每字约 2-3 tokens，乘上 3 為保守上限，再限制在 2048 內
         max_tokens = min(2048, max(256, len(text) * 3))
         gen_kwargs["max_new_tokens"] = max_tokens
         kwargs.update(gen_kwargs)
@@ -535,26 +531,55 @@ class TTSModule:
         with self._torch.inference_mode():
             wavs, sr = self._model.generate_custom_voice(**kwargs)
 
+        import numpy as np
         if isinstance(wavs, np.ndarray):
             wavs = [wavs]
 
         merged = self._concat_wavs(
             [np.asarray(w).squeeze() for w in wavs], sr
         )
-
-        # ── 投影片頭尾加靜音 padding ──
         merged = self._add_slide_padding(merged, sr)
 
         sf.write(str(wav_path), merged, int(sr))
 
-        if final_path.suffix.lower() != ".wav":
-            self._export_audio(wav_path, final_path)
-        else:
-            if wav_path.resolve() != final_path.resolve():
-                shutil.copy2(wav_path, final_path)
-
-        # LUFS loudness normalisation
-        self._loudnorm(final_path)
+        # [OPTIMIZATION] Merge format conversion and loudnorm into a SINGLE ffmpeg command
+        ffmpeg = shutil.which("ffmpeg")
+        if ffmpeg and final_path.suffix.lower() != ".wav":
+            try:
+                cmd = [
+                    ffmpeg, "-y", "-hide_banner", "-loglevel", "error",
+                    "-i", str(wav_path)
+                ]
+                
+                if self.enable_loudnorm:
+                    af = (
+                        f"loudnorm=I={self.loudnorm_target_lufs}"
+                        f":LRA={self.loudnorm_lra}"
+                        f":TP={self.loudnorm_tp}"
+                    )
+                    cmd += ["-af", af]
+                    
+                if final_path.suffix.lower() == ".mp3":
+                    cmd += ["-acodec", "libmp3lame", "-b:a", "192k"]
+                    
+                cmd.append(str(final_path))
+                subprocess.run(cmd, check=True)
+                
+                if not self.keep_temp_wav:
+                    wav_path.unlink(missing_ok=True)
+                    
+                return  # Successfully converted and normalized
+                
+            except Exception as e:
+                self.logger.warning(f"Merged FFmpeg processing failed: {e}")
+                # Fallback to standard copy if it failed
+                
+        # Fallback if ffmpeg is not available or failed, or if target is wav
+        if wav_path.resolve() != final_path.resolve():
+            shutil.copy2(wav_path, final_path)
+        if self.enable_loudnorm and ffmpeg:
+            self._loudnorm(final_path)
+        # （原始程式碼中需要呼叫 self._export_audio 與 self._loudnorm 的部分已被移除）
 
     # =========================================================================
     # ASR + alignment
@@ -691,74 +716,73 @@ class TTSModule:
                     pass
 
     def run(self, scripts: List[str]) -> Tuple[str, List[List[Tuple[float, float]]], List[List[Tuple[str, float, float]]]]:
-        import torch  # 用於 CUDA cache 清理
-
+        import torch
+        from concurrent.futures import ThreadPoolExecutor
+        
         assert self.is_loaded, "Call load() before run()"
-
         self._cleanup_old_numbered_audio()
-        all_timings: List[List[Tuple[float, float]]] = []
-        all_asr_words: List[List[Tuple[str, float, float]]] = []
-
-        for idx, script in enumerate(scripts, start=1):
-            base = self.output_root / str(idx)
-            wav_path = base.with_suffix(".wav")
-            final_path = base.with_suffix(f".{self.target_format}")
-
-            if not isinstance(script, str) or not script.strip():
-                self._create_silent_audio(final_path, 0.25)
-                all_timings.append([])
-                all_asr_words.append([])
-                continue
-
+        
+        # [FIX] Pre-allocate arrays with the exact length of scripts to avoid IndexError
+        all_timings: List[List[Tuple[float, float]]] = [[] for _ in range(len(scripts))]
+        all_asr_words: List[List[Tuple[str, float, float]]] = [[] for _ in range(len(scripts))]
+        
+        def process_asr(idx, script_text, w_path, f_path, c_script):
             try:
-                clean_script = self._preprocess_text(script)
-
-                self._gen_qwen(clean_script, wav_path, final_path)
-
-                asr_input = wav_path if wav_path.exists() else final_path
-                asr_words = self._transcribe_with_timestamps(asr_input)
-
+                asr_input = w_path if w_path.exists() else f_path
+                a_words = self._transcribe_with_timestamps(asr_input)
+                
                 fallback_dur = self._get_audio_duration(asr_input)
-                if fallback_dur <= 0 and asr_words:
-                    fallback_dur = asr_words[-1][2]
+                if fallback_dur <= 0 and a_words:
+                    fallback_dur = a_words[-1][2]
                 if fallback_dur <= 0:
-                    fallback_dur = max(1.0, 0.35 * len(clean_script.split()))
-
-                timings = self._align_script_to_asr(clean_script, asr_words, fallback_dur)
-
-                all_timings.append(timings)
-                all_asr_words.append(asr_words)
-
-                dur = timings[-1][1] if timings else fallback_dur
-                size = final_path.stat().st_size if final_path.exists() else 0
-                self.logger.info(
-                    f"Slide {idx}: {size} bytes | {dur:.2f}s | "
-                    f"{len(timings)} words"
-                )
-
-                if (not self.keep_temp_wav
-                    and self.target_format != "wav"
-                    and wav_path.exists()):
-                    wav_path.unlink(missing_ok=True)
-
-                # 每頁處理完成後清理 CUDA cache，防止多頁面時記憶體累積
-                torch.cuda.empty_cache()
-
+                    fallback_dur = max(1.0, 0.35 * len(c_script.split()))
+                    
+                t_timings = self._align_script_to_asr(c_script, a_words, fallback_dur)
+                return t_timings, a_words
             except Exception as e:
-                self.logger.warning(f"Slide {idx} failed: {e}")
-                words = script.split()
-                timings = self._uniform_timings(
-                    len(words), max(1.0, 0.33 * len(words))
-                ) if words else []
-                timings = self._ensure_monotonic_nonneg(timings)
-                all_timings.append(timings)
-                all_asr_words.append([])
+                self.logger.warning(f"ASR Slide {idx} failed: {e}")
+                words = script_text.split()
+                fallback_t = self._uniform_timings(len(words), max(1.0, 0.33 * len(words))) if words else []
+                return self._ensure_monotonic_nonneg(fallback_t), []
 
-                self._create_silent_audio(
-                    final_path, timings[-1][1] if timings else 0.25
-                )
-
-                # 異常後也清理 CUDA cache
-                torch.cuda.empty_cache()
+        # [OPTIMIZATION] ASR Pipeline using ThreadPoolExecutor for concurrent execution
+        # Set max_workers=1 to avoid overloading the GPU while TTS is running
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            asr_futures = {}
+            
+            for idx, script in enumerate(scripts, start=1):
+                i = idx - 1  # 0-indexed for our lists
+                base = self.output_root / str(idx)
+                wav_path = base.with_suffix(".wav")
+                final_path = base.with_suffix(f".{self.target_format}")
+                
+                if not isinstance(script, str) or not script.strip():
+                    self._create_silent_audio(final_path, 0.25)
+                    continue
+                    
+                try:
+                    clean_script = self._preprocess_text(script)
+                    
+                    # 1. Blocking: Generate TTS Audio (Heavy PyTorch Operation)
+                    self._gen_qwen(clean_script, wav_path, final_path)
+                    
+                    # 2. Non-blocking: Submit ASR task to background thread
+                    future = executor.submit(process_asr, idx, script, wav_path, final_path, clean_script)
+                    asr_futures[i] = future
+                    
+                    # Clean up TTS cache before next generation
+                    torch.cuda.empty_cache()
+                    
+                except Exception as e:
+                    self.logger.warning(f"Slide {idx} failed: {e}")
+                    self._create_silent_audio(final_path, 0.25)
+                    torch.cuda.empty_cache()
+            
+            # Wait for all ASR tasks to complete and populate pre-allocated arrays
+            for i in range(len(scripts)):
+                if i in asr_futures:
+                    timings, asr_words = asr_futures[i].result()
+                    all_timings[i] = timings
+                    all_asr_words[i] = asr_words
 
         return str(self.output_root), all_timings, all_asr_words
