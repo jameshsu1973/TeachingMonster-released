@@ -84,7 +84,7 @@ class TTSModule:
         # ── generation kwargs: 保守設定以求一致 ──
         default_gen_kwargs = {
             "do_sample": True,
-            "temperature": 0.5,        # 降低 → 減少開頭不穩定與裝神祕感
+            "temperature": 0.3,        # 降低 → 減少開頭不穩定與裝神祕感
             "top_p": 0.75,             # 收窄 → 減少極端取樣，提高穩定性
             "top_k": 20,               # 收窄 → 限制詞表範圍，語調更一致
             "repetition_penalty": 1.15, # 提高 → 進一步減少重複
@@ -488,6 +488,39 @@ class TTSModule:
         if not self.keep_temp_wav and tmp_wav.exists():
             tmp_wav.unlink(missing_ok=True)
 
+    def _export_and_loudnorm(self, src_path: Path, dst_path: Path) -> None:
+        """
+        將 WAV 轉存為目標格式 (如 MP3) 並同時套用 FFmpeg loudnorm。
+        這解決了破音 (clipping) 且省去了一次額外的轉碼！
+        """
+        ffmpeg = shutil.which("ffmpeg")
+        if not ffmpeg:
+            self.logger.warning("ffmpeg not found, skipping loudnorm.")
+            # fallback to simple export
+            return self._create_silent_audio(dst_path) # placeholder for fallback
+
+        dst_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            af = (
+                f"loudnorm=I={self.loudnorm_target_lufs}"
+                f":LRA={self.loudnorm_lra}"
+                f":TP={self.loudnorm_tp}"
+                f":print_format=summary"
+            )
+            cmd = [
+                ffmpeg, "-y",
+                "-hide_banner", "-loglevel", "error",
+                "-i", str(src_path),
+                "-af", af,
+            ]
+            if dst_path.suffix.lower() == ".mp3":
+                cmd += ["-acodec", "libmp3lame", "-b:a", "192k"]
+            cmd.append(str(dst_path))
+            
+            subprocess.run(cmd, check=True)
+        except Exception as e:
+            self.logger.warning(f"Loudnorm combined export failed: {e}")
+
     # =========================================================================
     # TTS generation
     # =========================================================================
@@ -543,42 +576,11 @@ class TTSModule:
         sf.write(str(wav_path), merged, int(sr))
 
         # [OPTIMIZATION] Merge format conversion and loudnorm into a SINGLE ffmpeg command
-        ffmpeg = shutil.which("ffmpeg")
-        if ffmpeg and final_path.suffix.lower() != ".wav":
-            try:
-                cmd = [
-                    ffmpeg, "-y", "-hide_banner", "-loglevel", "error",
-                    "-i", str(wav_path)
-                ]
+        if self.enable_loudnorm:
+            self._export_and_loudnorm(wav_path, final_path)
+        else:
+            self._export_audio(wav_path, final_path) # 原有邏輯
                 
-                if self.enable_loudnorm:
-                    af = (
-                        f"loudnorm=I={self.loudnorm_target_lufs}"
-                        f":LRA={self.loudnorm_lra}"
-                        f":TP={self.loudnorm_tp}"
-                    )
-                    cmd += ["-af", af]
-                    
-                if final_path.suffix.lower() == ".mp3":
-                    cmd += ["-acodec", "libmp3lame", "-b:a", "192k"]
-                    
-                cmd.append(str(final_path))
-                subprocess.run(cmd, check=True)
-                
-                if not self.keep_temp_wav:
-                    wav_path.unlink(missing_ok=True)
-                    
-                return  # Successfully converted and normalized
-                
-            except Exception as e:
-                self.logger.warning(f"Merged FFmpeg processing failed: {e}")
-                # Fallback to standard copy if it failed
-                
-        # Fallback if ffmpeg is not available or failed, or if target is wav
-        if wav_path.resolve() != final_path.resolve():
-            shutil.copy2(wav_path, final_path)
-        if self.enable_loudnorm and ffmpeg:
-            self._loudnorm(final_path)
         # （原始程式碼中需要呼叫 self._export_audio 與 self._loudnorm 的部分已被移除）
 
     # =========================================================================
@@ -603,7 +605,7 @@ class TTSModule:
             vad_filter=self.asr_use_vad,
             language=self._whisper_lang_code(),
             beam_size=1,
-            condition_on_previous_text=False,
+            condition_on_previous_text=True,
         )
         words = []
         for seg in segments:
@@ -738,6 +740,7 @@ class TTSModule:
                     fallback_dur = max(1.0, 0.35 * len(c_script.split()))
                     
                 t_timings = self._align_script_to_asr(c_script, a_words, fallback_dur)
+
                 return t_timings, a_words
             except Exception as e:
                 self.logger.warning(f"ASR Slide {idx} failed: {e}")
@@ -769,6 +772,10 @@ class TTSModule:
                     # 2. Non-blocking: Submit ASR task to background thread
                     future = executor.submit(process_asr, idx, script, wav_path, final_path, clean_script)
                     asr_futures[i] = future
+
+                    self.logger.info(
+                        f"|Slide {idx} generating | "
+                    )
                     
                     # Clean up TTS cache before next generation
                     torch.cuda.empty_cache()
@@ -784,5 +791,6 @@ class TTSModule:
                     timings, asr_words = asr_futures[i].result()
                     all_timings[i] = timings
                     all_asr_words[i] = asr_words
+                    
 
         return str(self.output_root), all_timings, all_asr_words
