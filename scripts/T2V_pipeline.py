@@ -97,7 +97,6 @@ class VideoGenerationPipeline:
         self.tts_module = TTSModule(
             output_root=self.tts_output_root,
             tts_instruct="",  # 明確設為空字串，抑制非預期音效（如笑聲）
-            tts_instruct_first="",  # 第一段也使用相同 neutral 指令，避免開頭過度活躍、後半段突兀
             slide_head_silence_ms=600.0,  # 投影片開頭停頓 0.6 秒
             slide_tail_silence_ms=1500.0,  # 投影片結尾停頓 1.5 秒，讓間隔更明確
             # ── 速度優化參數（與 tts.py 對齊）──
