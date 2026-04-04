@@ -4,7 +4,6 @@ import os
 import re
 import shutil
 import subprocess
-import threading
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -219,8 +218,8 @@ class TTSModule:
     # Text prep
     # =========================================================================
 
-    _SENT_END_RE = re.compile(r"(?<=[。！？!?.;；])\s+")
-    _SUB_SPLIT_RE = re.compile(r"(?<=[,，、:：])\s*|(?<=—)\s*|(?<=–)\s*")
+    _SENT_END_RE = re.compile(r"(?<=[。！？!?.;；])s+")
+    _SUB_SPLIT_RE = re.compile(r"(?<=[,，、:：])s*|(?<=—)s*|(?<=–)s*")
 
     def _preprocess_text(self, text: str) -> str:
         if not text:
@@ -579,9 +578,7 @@ class TTSModule:
         if self.enable_loudnorm:
             self._export_and_loudnorm(wav_path, final_path)
         else:
-            self._export_audio(wav_path, final_path) # 原有邏輯
-                
-        # （原始程式碼中需要呼叫 self._export_audio 與 self._loudnorm 的部分已被移除）
+            self._export_audio(wav_path, final_path)
 
     # =========================================================================
     # ASR + alignment
@@ -605,7 +602,7 @@ class TTSModule:
             vad_filter=self.asr_use_vad,
             language=self._whisper_lang_code(),
             beam_size=1,
-            condition_on_previous_text=True,
+            condition_on_previous_text=False,  # [FIX 3] False prevents Whisper hallucination across independent slides
         )
         words = []
         for seg in segments:
@@ -717,14 +714,13 @@ class TTSModule:
                 except OSError:
                     pass
 
-    def run(self, scripts: List[str]) -> Tuple[str, List[List[Tuple[float, float]]], List[List[Tuple[str, float, float]]]]:
+    def run(self, scripts: List[str]) -> Tuple[str, List[List[Tuple[float, float]]]]:
         import torch
         from concurrent.futures import ThreadPoolExecutor
         
         assert self.is_loaded, "Call load() before run()"
         self._cleanup_old_numbered_audio()
         
-        # [FIX] Pre-allocate arrays with the exact length of scripts to avoid IndexError
         all_timings: List[List[Tuple[float, float]]] = [[] for _ in range(len(scripts))]
         all_asr_words: List[List[Tuple[str, float, float]]] = [[] for _ in range(len(scripts))]
         
@@ -747,9 +743,15 @@ class TTSModule:
                 words = script_text.split()
                 fallback_t = self._uniform_timings(len(words), max(1.0, 0.33 * len(words))) if words else []
                 return self._ensure_monotonic_nonneg(fallback_t), []
+            finally:
+                # [FIX 1] Ensure temporary WAV is deleted AFTER ASR finishes reading it, preventing disk leak
+                if not self.keep_temp_wav and w_path.exists() and self.target_format != "wav":
+                    try:
+                        w_path.unlink(missing_ok=True)
+                    except Exception:
+                        pass
 
-        # [OPTIMIZATION] ASR Pipeline using ThreadPoolExecutor for concurrent execution
-        # Set max_workers=1 to avoid overloading the GPU while TTS is running
+        # Pipeline using ThreadPoolExecutor for concurrent ASR
         with ThreadPoolExecutor(max_workers=1) as executor:
             asr_futures = {}
             
@@ -766,31 +768,30 @@ class TTSModule:
                 try:
                     clean_script = self._preprocess_text(script)
                     
-                    # 1. Blocking: Generate TTS Audio (Heavy PyTorch Operation)
+                    # 1. Blocking: Generate TTS Audio (PyTorch Inference)
                     self._gen_qwen(clean_script, wav_path, final_path)
                     
                     # 2. Non-blocking: Submit ASR task to background thread
                     future = executor.submit(process_asr, idx, script, wav_path, final_path, clean_script)
                     asr_futures[i] = future
 
-                    self.logger.info(
-                        f"|Slide {idx} generating | "
-                    )
+                    self.logger.info(f"|Slide {idx} generated | ASR proceeding in background")
                     
-                    # Clean up TTS cache before next generation
-                    torch.cuda.empty_cache()
+                    # [FIX 2] torch.cuda.empty_cache() has been REMOVED here! 
+                    # PyTorch caching allocator reuses memory. Forcing empty_cache() blocks the GPU
+                    # and destroys performance. Let PyTorch manage it natively.
                     
                 except Exception as e:
                     self.logger.warning(f"Slide {idx} failed: {e}")
                     self._create_silent_audio(final_path, 0.25)
+                    # Only clear cache on error to recover from potential OOM
                     torch.cuda.empty_cache()
             
-            # Wait for all ASR tasks to complete and populate pre-allocated arrays
+            # Wait for all ASR tasks to complete
             for i in range(len(scripts)):
                 if i in asr_futures:
                     timings, asr_words = asr_futures[i].result()
                     all_timings[i] = timings
                     all_asr_words[i] = asr_words
                     
-
-        return str(self.output_root), all_timings, all_asr_words
+        return str(self.output_root), all_timings
