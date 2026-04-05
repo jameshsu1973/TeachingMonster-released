@@ -1,0 +1,36 @@
+{
+  "scripts": [
+    {
+      "slide_id": "slide1",
+      "script": "Welcome to our course on making sense of regression. In the business world, regression is far more than just a statistical exercise; it is a powerful tool for estimating the real-world impact of your decisions. Throughout this series, we will focus on interpreting software outputs rather than getting lost in complex formulas, helping you bridge the gap between abstract mathematics and actionable business strategy. We have a five-part journey ahead of us, and to get started, let's look at the most critical element of any regression report: the slope."
+    },
+    {
+      "slide_id": "slide2",
+      "script": "At the heart of any regression analysis is the slope, represented here by the letter m in our equation. You can think of this coefficient as the engine of your business forecast, as it quantifies the expected change in your target variable for every one-unit change in your input. Because it clearly defines the rate of impact, it is an essential metric for any professional trying to project future results based on current data. But how do we actually find this number when we are looking at real-world reports?"
+    },
+    {
+      "slide_id": "slide3",
+      "script": "Now that we understand the importance of the slope, let's look at how to extract it from your Excel output. While the scatterplot provides a helpful visual, the precise value you need for your forecast is tucked away in the regression table. Simply locate the row corresponding to your input variable and look across to the Coefficients column. The number you see there is your slope, representing the expected change in your target variable for every one-unit increase in your input. Now that we have identified the slope, we need to determine how reliable that estimate actually is."
+    },
+    {
+      "slide_id": "slide4",
+      "script": "Now that we have identified our slope, it is important to remember that regression results are estimates rather than absolute truths. To account for this uncertainty, we use a confidence interval, which acts as a range of reliability for our slope estimate. You can think of this much like a weather forecast that provides a range of expected temperatures rather than a single number. A narrower interval suggests higher precision in our estimate, while a wider one reminds us to be more cautious. Let's formalize how we describe this interval in plain English."
+    },
+    {
+      "slide_id": "slide5",
+      "script": "Now that we understand the concept of a range of reliability, we need to communicate it effectively. When presenting your findings, avoid overly academic jargon and focus on the business impact. A clear, professional way to state this is to say, 'We are 95% confident the true impact is between these two values.' This range represents your potential business risk, helping stakeholders understand the uncertainty inherent in any estimate. By using this standard format, you provide a clear, actionable summary of the data. Now, let's practice extracting these specific bounds from the software output."
+    },
+    {
+      "slide_id": "slide6",
+      "script": "Now that we know how to describe an interval, let's look at how to extract those values from your software output. As you can see in the table, the process is straightforward: first, locate the columns labeled Lower 95% and Upper 95%, which I have highlighted for you here. Next, simply follow the row corresponding to your specific variable to find the boundary values. While the software handles the heavy lifting of the calculation, it is your responsibility to accurately extract and interpret these limits for your report. What happens, though, if that range includes zero? That leads us to our next topic: significance testing."
+    },
+    {
+      "slide_id": "slide7",
+      "script": "Now that you have extracted your confidence intervals, we apply the Zero Rule to determine statistical significance. As you can see in the flowchart, the core question is simple: does your interval cross zero? Because zero represents a state of no effect, an interval that includes it suggests that your variable might just be reflecting random noise rather than a true relationship. However, if the entire interval stays either positive or negative, we can conclude that the relationship is statistically significant. This distinction is vital for avoiding false conclusions in your analysis. To wrap up, let's review the final checklist for your work."
+    },
+    {
+      "slide_id": "slide8",
+      "script": "To wrap up, let's perform a final sanity check on your workflow for interpreting regression reports. You now have three core takeaways to guide your analysis: first, identify the slope to quantify the actual business impact; second, use confidence intervals to establish the range of reliability for your estimates; and third, apply the Zero Rule to ensure your findings are statistically significant rather than just noise. By following these steps, you can approach any regression output with confidence and clarity. Thank you for completing this overview of regression interpretation."
+    }
+  ]
+}

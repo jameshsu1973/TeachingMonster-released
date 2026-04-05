@@ -1,0 +1,58 @@
+{
+  "layout": "BALANCED_SPLIT",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "Spotting the Slope in Excel",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 12.33,
+        "h": 0.8,
+        "style": {
+          "font_size": 44,
+          "alignment": "LEFT",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "• Ignore the scatterplot; focus on the 'Coefficients' table.\n\n• Identify the row corresponding to your specific input variable.\n\n• The value in the Coefficient column is your slope.",
+        "x": 0.5,
+        "y": 2.0,
+        "w": 6.0,
+        "h": 4.0,
+        "style": {
+          "font_size": 24,
+          "alignment": "LEFT",
+          "bold": false
+        }
+      },
+      {
+        "type": "image",
+        "prompt": "Professional Excel regression analysis output table showing coefficients, p-values, and standard errors.",
+        "x": 7.0,
+        "y": 2.0,
+        "w": 5.83,
+        "h": 4.0
+      },
+      {
+        "type": "shape",
+        "shape_type": "RECTANGLE",
+        "color": "#FF0000",
+        "text": "",
+        "x": 8.5,
+        "y": 2.5,
+        "w": 1.5,
+        "h": 3.0,
+        "style": {
+          "font_size": 0
+        }
+      }
+    ]
+  },
+  "id": "slide3"
+}

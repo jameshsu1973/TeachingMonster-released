@@ -1,0 +1,45 @@
+{
+  "layout": "BALANCED_SPLIT",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "The Zero Rule",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 5.5,
+        "h": 1.0,
+        "style": {
+          "font_size": 44,
+          "alignment": "LEFT",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "• Zero represents 'No Effect'\n\n• If the interval includes zero, the variable is likely just noise\n\n• If it stays positive or negative, the relationship is statistically significant",
+        "x": 0.5,
+        "y": 2.0,
+        "w": 5.5,
+        "h": 4.0,
+        "style": {
+          "font_size": 22,
+          "alignment": "LEFT",
+          "bold": false
+        }
+      },
+      {
+        "type": "image",
+        "prompt": "A clean, professional flowchart. Top: 'Does interval cross zero?'. Branch 1: 'Yes' -> 'Not Significant'. Branch 2: 'No' -> 'Significant'. High contrast, modern vector style.",
+        "x": 6.5,
+        "y": 1.5,
+        "w": 5.5,
+        "h": 4.5
+      }
+    ]
+  },
+  "id": "slide7"
+}

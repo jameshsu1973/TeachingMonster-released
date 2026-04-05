@@ -1,0 +1,63 @@
+{
+  "layout": "CUSTOM",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "Course Recap & Sanity Check",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 12.33,
+        "h": 1.0,
+        "style": {
+          "font_size": 44,
+          "alignment": "CENTER",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "• Identify slope to understand business impact",
+        "x": 1.66,
+        "y": 2.0,
+        "w": 10.0,
+        "h": 1.0,
+        "style": {
+          "font_size": 24,
+          "alignment": "LEFT",
+          "bold": false
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "• Use confidence intervals to define the range of reliability",
+        "x": 1.66,
+        "y": 3.5,
+        "w": 10.0,
+        "h": 1.0,
+        "style": {
+          "font_size": 24,
+          "alignment": "LEFT",
+          "bold": false
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "• Apply the Zero Rule to ensure statistical significance",
+        "x": 1.66,
+        "y": 5.0,
+        "w": 10.0,
+        "h": 1.0,
+        "style": {
+          "font_size": 24,
+          "alignment": "LEFT",
+          "bold": false
+        }
+      }
+    ]
+  },
+  "id": "slide8"
+}

@@ -36,20 +36,10 @@ class TTSModule:
     """
 
     INSTRUCT_PRESETS = {
-        "neutral": "You are a natural human. Speak in a natural human vocal energy, steady , warmth. Keep same pace, same tone and clear enunciation.",
-        "calm_narrator": (
-            "Speak like a knowledgeable human narrator: use natural intonation with "
-            "slight emphasis on key words, gentle rises on questions, and natural "
-            "drops at sentence endings. Maintain a warm, steady pace throughout."
-        ),
-        "presentation": (
-            "Speak like a confident human presenter: vary your pitch naturally, "
-            "stress important concepts, and keep a clear moderate pace."
-        ),
-        "energetic": (
-            "Speak with genuine enthusiasm and lively intonation, like an engaging "
-            "human educator who is excited to share knowledge!"
-        ),
+        "neutral": "",
+        "calm_narrator": "Speak in a calm, steady, professional narrator tone.",
+        "presentation": "Speak clearly at a moderate pace, like a professional presenter.",
+        "energetic": "Speak with enthusiasm and energy, like an engaging educator excited to teach!",
     }
 
     def __init__(
@@ -57,19 +47,18 @@ class TTSModule:
         output_root: str = "./dummy_tts",
         speaker: str = "Ryan",
         language: str = "English",
-        #tts_instruct: Optional[str] = "calm_narrator",
-        tts_instruct: Optional[str] = "neutral",
+        tts_instruct: Optional[str] = "calm_narrator",
         generation_kwargs: Optional[Dict[str, Any]] = None,
         target_format: str = "mp3",
         keep_temp_wav: bool = False,
         # ── chunking ──────────────────────────────────────────────────────────
-        max_chunk_chars: int = 300,
+        max_chunk_chars: int = 250,
         min_chunk_chars: int = 25,
         # chunk 間（句子間）插入的固定靜音長度，讓節奏均等可預期。
-        silence_between_segments_ms: float = 100.0,
+        silence_between_segments_ms: float = 150.0,
         # ── silence padding (slide head/tail) ────────────────────────────────
-        slide_head_silence_ms: float = 200.0,
-        slide_tail_silence_ms: float = 200.0,
+        slide_head_silence_ms: float = 600.0,
+        slide_tail_silence_ms: float = 1500.0,
         # ── post-processing ───────────────────────────────────────────────────
         loudnorm_target_lufs: float = -18.0,
         loudnorm_tp: float = -1.5,
@@ -94,11 +83,11 @@ class TTSModule:
             # Greedy decoding：完全消除隨機性，讓每個 chunk 在相同 instruct
             # 下生成音域一致的輸出，防止跨 chunk 音色跳動。
             # do_sample=False 時 temperature/top_p/top_k 無作用，可留作備用。
-            "do_sample": True,
-            "temperature": 0.5,      # greedy 模式下無作用，保留供切換 sampling 時使用
-            "top_p": 0.85,            # 同上
-            "top_k": 20,              # 同上（0 = 不限制）
-            "repetition_penalty": 1.1,  # greedy 下降低，避免音調跳動
+            "do_sample": False,
+            "temperature": 1.0,      # greedy 模式下無作用，保留供切換 sampling 時使用
+            "top_p": 1.0,            # 同上
+            "top_k": 0,              # 同上（0 = 不限制）
+            "repetition_penalty": 1.05,  # greedy 下降低，避免音調跳動
             "max_new_tokens": 2048,
         }
         default_gen_kwargs.update(generation_kwargs or {})
@@ -403,14 +392,10 @@ class TTSModule:
                 "-i", str(src_path),
             ]
             if dst_path.suffix.lower() == ".mp3":
-                # CBR + 關閉 Xing header：消除 moviepy 讀取 VBR MP3 時的
-                # buffer 超界警告（VBR duration 估算偏差導致）。
-                cmd += [
-                    "-acodec", "libmp3lame",
-                    "-b:a", "192k",
-                    "-abr", "0",
-                    "-write_xing", "0",
-                ]
+                # -write_xing 1：讓 lame 在 MP3 頭部寫入精確的 Xing/Info header，
+                # 記錄總 frame 數與 duration，moviepy 讀取時就不會因 VBR duration
+                # 估算偏差而產生 buffer 超界（index out of bounds）警告。
+                cmd += ["-acodec", "libmp3lame", "-b:a", "192k", "-write_xing", "1"]
             cmd.append(str(dst_path))
             subprocess.run(cmd, check=True)
             return
@@ -465,15 +450,8 @@ class TTSModule:
                 "-af", af,
             ]
             if dst_path.suffix.lower() == ".mp3":
-                # CBR 而非 VBR：loudnorm 改變增益後 frame 數固定，
-                # 消除 VBR duration header 與實際 sample 數不一致的問題。
-                # -write_xing 0：CBR 不需要 Xing header，明確關閉避免混淆。
-                cmd += [
-                    "-acodec", "libmp3lame",
-                    "-b:a", "192k",
-                    "-abr", "0",        # 強制 CBR（關閉 ABR 模式）
-                    "-write_xing", "0", # CBR 不寫 Xing，消除 VBR/CBR 混用
-                ]
+                # -write_xing 1：同 _export_audio，確保 Xing header 精確
+                cmd += ["-acodec", "libmp3lame", "-b:a", "192k", "-write_xing", "1"]
             cmd.append(str(dst_path))
             subprocess.run(cmd, check=True)
         except Exception as e:
@@ -563,8 +541,7 @@ class TTSModule:
         gen_kwargs = self.generation_kwargs.copy()
         # 按最長 chunk 計算，不按整張投影片總長，避免過度分配
         max_chunk_len = max(len(c) for c in chunks)
-        gen_kwargs["max_new_tokens"] = min(2048, max(256, max_chunk_len * 3))
-        gen_kwargs.setdefault("min_new_tokens", max(32, max_chunk_len // 2))
+        gen_kwargs["max_new_tokens"] = min(2048, max(256, max_chunk_len * 4))
         kwargs.update(gen_kwargs)
 
         with self._torch.inference_mode():
@@ -575,7 +552,7 @@ class TTSModule:
 
         segments = [np.asarray(w).squeeze().astype(np.float32) for w in wavs]
         audio = self._concat_segments(segments, int(sr))
-        #audio = self._add_slide_padding(audio, int(sr))
+        audio = self._add_slide_padding(audio, int(sr))
         return audio, int(sr)
 
     def _cpu_postprocess(
@@ -763,7 +740,6 @@ class TTSModule:
         讓 Whisper 在等 WAV 寫完的期間不佔用主執行緒。
         ─────────────────────────────────────────────────────────────────────
         """
-        import time as _time
         assert self.is_loaded, "Call load() before run()"
         self._cleanup_old_numbered_audio()
 
@@ -775,8 +751,6 @@ class TTSModule:
             self._torch.cuda.manual_seed_all(0)
 
         all_timings: List[List[Tuple[float, float]]] = [[] for _ in range(len(scripts))]
-        _slide_times: List[float] = []   # 各張投影片 GPU 推論時間（秒）
-        _run_start = _time.perf_counter()
 
         # [OPT-3] 分離兩個 worker：一個跑 postprocess，一個跑 ASR
         # max_workers=2 確保兩者可以真正並行
@@ -849,10 +823,7 @@ class TTSModule:
                     clean_script = self._preprocess_text(script)
 
                     # ── Step 1: GPU 推論（主執行緒，阻塞）──────────────────
-                    _t0 = _time.perf_counter()
                     audio, sr = self._infer_gpu(clean_script)
-                    _infer_sec = _time.perf_counter() - _t0
-                    _slide_times.append(_infer_sec)
 
                     # ── Step 2: CPU 後處理（worker thread，非阻塞）─────────
                     # GPU 推論結束後立刻提交寫檔 + ffmpeg，主執行緒繼續下一張
@@ -867,10 +838,8 @@ class TTSModule:
                     )
                     asr_futures[i] = executor.submit(asr_task)
 
-                    chunks_n = len(self._split_text_for_tts(clean_script))
                     self.logger.info(
-                        f"[TIMER] Slide {idx:>2d} | GPU infer {_infer_sec:.2f}s "
-                        f"| {chunks_n} chunk(s) | {len(clean_script)} chars"
+                        f"Slide {idx} GPU done | postprocess + ASR dispatched to background"
                     )
 
                 except Exception as e:
@@ -886,13 +855,4 @@ class TTSModule:
                 except Exception as e:
                     self.logger.warning(f"ASR collect Slide {i + 1} failed: {e}")
 
-        _total_sec = _time.perf_counter() - _run_start
-        if _slide_times:
-            self.logger.info(
-                f"[TIMER] ══ TTS run complete ══ "
-                f"total={_total_sec:.1f}s | "
-                f"GPU infer sum={sum(_slide_times):.1f}s | "
-                f"avg per slide={sum(_slide_times)/len(_slide_times):.2f}s | "
-                f"slides={len(_slide_times)}"
-            )
         return str(self.output_root), all_timings

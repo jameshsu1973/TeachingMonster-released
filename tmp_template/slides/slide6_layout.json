@@ -1,0 +1,45 @@
+{
+  "layout": "BALANCED_SPLIT",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "Reading Bounds from Software",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 6.0,
+        "h": 1.0,
+        "style": {
+          "font_size": 44,
+          "alignment": "LEFT",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "1. Locate the 'Lower 95%' and 'Upper 95%' columns.\n\n2. Follow the row of your chosen variable.\n\n3. Extract the boundary values for your report.",
+        "x": 0.5,
+        "y": 2.0,
+        "w": 6.0,
+        "h": 3.0,
+        "style": {
+          "font_size": 24,
+          "alignment": "LEFT",
+          "bold": false
+        }
+      },
+      {
+        "type": "image",
+        "prompt": "A professional Excel table showing statistical variables in rows and 'Lower 95%' and 'Upper 95%' columns, with those two specific columns highlighted in a soft blue or yellow background to indicate focus.",
+        "x": 7.0,
+        "y": 1.5,
+        "w": 5.83,
+        "h": 4.5
+      }
+    ]
+  },
+  "id": "slide6"
+}

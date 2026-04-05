@@ -1,0 +1,62 @@
+{
+  "layout": "SPLIT_SCREEN",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "What is a Slope?",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 12.33,
+        "h": 1.0,
+        "style": {
+          "font_size": 44,
+          "alignment": "LEFT",
+          "bold": true
+        }
+      },
+      {
+        "type": "math",
+        "latex": "Y = \\color{blue}{m}X + b",
+        "x": 0.5,
+        "y": 2.5,
+        "w": 5.5,
+        "h": 2.0,
+        "style": {
+          "font_size": 48,
+          "color": "#000000"
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "m = Slope / Impact",
+        "x": 0.5,
+        "y": 4.5,
+        "w": 5.5,
+        "h": 0.8,
+        "style": {
+          "font_size": 24,
+          "alignment": "CENTER",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "• Slope represents the 'Unit Change'\n\n• Shows the rate of impact on the target variable\n\n• Vital for forecasting future business results",
+        "x": 7.0,
+        "y": 2.0,
+        "w": 5.83,
+        "h": 4.0,
+        "style": {
+          "font_size": 24,
+          "alignment": "LEFT",
+          "bold": false
+        }
+      }
+    ]
+  },
+  "id": "slide2"
+}

@@ -1,0 +1,52 @@
+{
+  "layout": "CENTERED_FOCUS",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "Describing the Interval",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 12.33,
+        "h": 1.0,
+        "style": {
+          "font_size": 44,
+          "alignment": "CENTER",
+          "bold": true
+        }
+      },
+      {
+        "type": "shape",
+        "shape_type": "RECTANGLE",
+        "color": "#F0F0F0",
+        "text": "The true impact is likely between [Lower] and [Upper].",
+        "x": 2.0,
+        "y": 2.0,
+        "w": 9.33,
+        "h": 1.5,
+        "style": {
+          "font_size": 32,
+          "alignment": "CENTER",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "• Use the phrase: 'We are 95% confident the true impact is between X and Y'\n• High/Low range reflects potential business risk\n• Avoid academic probability jargon",
+        "x": 2.0,
+        "y": 4.5,
+        "w": 9.33,
+        "h": 2.0,
+        "style": {
+          "font_size": 24,
+          "alignment": "LEFT",
+          "bold": false
+        }
+      }
+    ]
+  },
+  "id": "slide5"
+}

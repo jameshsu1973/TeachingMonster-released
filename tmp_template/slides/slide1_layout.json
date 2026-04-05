@@ -1,0 +1,37 @@
+{
+  "layout": "CENTERED_FOCUS",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "Welcome: Making Sense of Regression",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 12.33,
+        "h": 1.5,
+        "style": {
+          "font_size": 44,
+          "alignment": "CENTER",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "• Regression is a tool for estimating business impacts\n\n• Focus on interpreting software outputs\n\n• Bridge the gap between math and decision-making",
+        "x": 2.0,
+        "y": 2.5,
+        "w": 9.33,
+        "h": 3.0,
+        "style": {
+          "font_size": 24,
+          "alignment": "CENTER",
+          "bold": false
+        }
+      }
+    ]
+  },
+  "id": "slide1"
+}

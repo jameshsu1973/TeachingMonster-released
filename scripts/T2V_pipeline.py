@@ -96,9 +96,8 @@ class VideoGenerationPipeline:
             
         self.tts_module = TTSModule(
             output_root=self.tts_output_root,
-            tts_instruct="",  # 明確設為空字串，抑制非預期音效（如笑聲）
-            slide_head_silence_ms=600.0,  # 投影片開頭停頓 0.6 秒
-            slide_tail_silence_ms=1500.0,  # 投影片結尾停頓 1.5 秒，讓間隔更明確
+            slide_head_silence_ms=0,  # 投影片開頭停頓 0.6 秒
+            slide_tail_silence_ms=0,  # 投影片結尾停頓 1.5 秒，讓間隔更明確
             # ── 速度優化參數（與 tts.py 對齊）──
             use_torch_compile=True,      # torch.compile 加速首生成（預設開啟）
             # parallel_slides=4,           # 投影片 TTS + ASR 並行數
@@ -124,10 +123,10 @@ class VideoGenerationPipeline:
         self,
         requirement_prompt: str,
         persona_prompt: str,
-        use_existing_slides: bool = False,
-        existing_slides_dir: str = "./tmp_template",
+        use_existing_slides: bool = True,
+        existing_slides_dir: str = "./tmp_template/slides",
         skip_steps_123: bool = False,
-        cache_dir: str = "./tmp",
+        cache_dir: str = "./tmp_template",
     ) -> dict:
         """
         Orchestrates the full generation process from text to MP4.
@@ -215,7 +214,7 @@ class VideoGenerationPipeline:
         # =============================
         # Step 4: Audio Synthesis
         # =============================
-        audio_folder, word_timings, *_extra = self.tts_module.run(scripts)
+        audio_folder, word_timings = self.tts_module.run(scripts)
         json.dump(word_timings, open(os.path.join(cache_dir, "word_timings.json"), "w+", encoding="utf-8"), ensure_ascii=False, indent=4)
 
         audio_paths: List[str] = [

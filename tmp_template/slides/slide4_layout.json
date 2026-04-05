@@ -1,0 +1,45 @@
+{
+  "layout": "BALANCED_SPLIT",
+  "style": {
+    "background": "#FFFFFF"
+  },
+  "content": {
+    "elements": [
+      {
+        "type": "textbox",
+        "text": "The Confidence Interval: An Error Margin",
+        "x": 0.5,
+        "y": 0.5,
+        "w": 6.0,
+        "h": 1.5,
+        "style": {
+          "font_size": 44,
+          "alignment": "LEFT",
+          "bold": true
+        }
+      },
+      {
+        "type": "textbox",
+        "text": "• Regression results are estimates, not absolute truth\n\n• Confidence Interval is a 'Range of Reliability'\n\n• Think of it like a weather forecast range",
+        "x": 0.5,
+        "y": 2.5,
+        "w": 6.0,
+        "h": 3.0,
+        "style": {
+          "font_size": 24,
+          "alignment": "LEFT",
+          "bold": false
+        }
+      },
+      {
+        "type": "image",
+        "prompt": "Minimalist graphic showing a bell curve distribution with a highlighted shaded confidence interval range, professional, clean vector style, blue and grey color palette.",
+        "x": 7.0,
+        "y": 2.0,
+        "w": 5.83,
+        "h": 4.0
+      }
+    ]
+  },
+  "id": "slide4"
+}
