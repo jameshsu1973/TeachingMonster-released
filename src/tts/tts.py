@@ -62,7 +62,7 @@ class TTSModule:
         loudnorm_tp: float = -1.5,
         loudnorm_lra: float = 11.0,
         enable_loudnorm: bool = True,
-        use_torch_compile: bool = False,
+        use_torch_compile: bool = True,
         asr_use_vad: bool = False,
         asr_model_gpu: str = "base",
         asr_model_cpu: str = "base",
@@ -77,7 +77,7 @@ class TTSModule:
             self.tts_instruct = None
 
         default_gen_kwargs = {
-            "do_sample": True,
+            "do_sample": False,
             "temperature": 0.3,
             "top_p": 0.75,
             "top_k": 20,
@@ -402,7 +402,9 @@ class TTSModule:
                 "-i", str(src_path),
             ]
             if dst_path.suffix.lower() == ".mp3":
-                cmd += ["-acodec", "libmp3lame", "-b:a", "192k"]
+                # -write_xing 1：讓 lame 在 MP3 頭部寫入精確的 Xing/Info header，記錄總 frame 數與 
+                # duration，moviepy 讀取時就不會因 VBR duration估算偏差而產生 buffer 超界（index out of bounds）警告。
+                cmd += ["-acodec", "libmp3lame", "-b:a", "192k", "-write_xing", "1"]
             cmd.append(str(dst_path))
             subprocess.run(cmd, check=True)
             return
@@ -457,7 +459,7 @@ class TTSModule:
                 "-af", af,
             ]
             if dst_path.suffix.lower() == ".mp3":
-                cmd += ["-acodec", "libmp3lame", "-b:a", "192k"]
+                cmd += ["-acodec", "libmp3lame", "-b:a", "192k", "-write_xing", "1"]
             cmd.append(str(dst_path))
             subprocess.run(cmd, check=True)
         except Exception as e:
@@ -728,6 +730,12 @@ class TTSModule:
         """
         assert self.is_loaded, "Call load() before run()"
         self._cleanup_old_numbered_audio()
+
+        # 從相同的 CUDA random state 出發，音色基準點一致。
+        # 每次 run() 重置，確保不同批次呼叫結果可重現。
+        self._torch.manual_seed(0)
+        if self._torch.cuda.is_available():
+            self._torch.cuda.manual_seed_all(0)
 
         all_timings: List[List[Tuple[float, float]]] = [[] for _ in range(len(scripts))]
 
